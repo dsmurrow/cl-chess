@@ -271,44 +271,42 @@ bool is_valid_move(Game *board, const Piece *piece, const Location newPlace, int
             }
         }
         /* CASTLING */
-        else if(piece->type == PIECE_KING && !(piece->hasMoved) &&
-                (newH == 3 || newH == 7) && deltY == 0)
+        else if(piece->type == PIECE_KING && !(piece->hasMoved) && (newH == 3 || newH == 7) && deltY == 0)
         {
-	    bool kingCanGo;
-	    int_fast8_t inc;
-	    uint_fast8_t i, rookIndex;
-	    Piece *rook;
+			bool kingCanGo;
+			int_fast8_t inc;
+			uint_fast8_t i, rookIndex;
+			Piece *rook;
 
 
-            if(flags & VALID_BROADCASTCALL) printf("got to castle\n");
-            rookIndex = newH == 3 ? I_ROOK1 : I_ROOK2;
-            rook = piece->color == TEAM_WHITE ? board->White[rookIndex] : board->Black[rookIndex];
+			if(flags & VALID_BROADCASTCALL) printf("got to castle\n");
+			rookIndex = newH == 3 ? I_ROOK1 : I_ROOK2;
+			rook = piece->color == TEAM_WHITE ? board->White[rookIndex] : board->Black[rookIndex];
 
-            if(flags & VALID_BROADCASTCALL) printf("castling rook initialized in is_valid_move()\n");
+			if(flags & VALID_BROADCASTCALL) printf("castling rook initialized in is_valid_move()\n");
 
-            kingCanGo = true;
-            inc = rookIndex == I_ROOK1 ? -1 : 1;
-            for(i = 5; kingCanGo && i != newH; i += inc)
-            {
-		Location temp;
+			kingCanGo = true;
+			inc = rookIndex == I_ROOK1 ? -1 : 1;
+			for(i = 5; kingCanGo && i != newH; i += inc)
+			{
+				Location temp;
 
-                if(flags & VALID_BROADCASTCALL) printf("castle loops\n");
+				if(flags & VALID_BROADCASTCALL) printf("castle loops\n");
 
-		location_assign(&temp, i, newV);
+				location_assign(&temp, i, newV);
 
 
-                assert(IS_ON_BOARD(i, newV));
-                if(!is_valid_move(board, piece, temp, VALID_KINGNOLIMIT | VALID_SELFCHECK | (flags & VALID_BROADCASTCALL)))
-                {
-                    kingCanGo = false;
-                }
-            }
+				assert(IS_ON_BOARD(i, newV));
+				if(!is_valid_move(board, piece, temp, VALID_KINGNOLIMIT | VALID_SELFCHECK | (flags & VALID_BROADCASTCALL)))
+				{
+					kingCanGo = false;
+				}
+        	}
             if(flags & VALID_BROADCASTCALL) printf("Completed castle loops: kingCanGo = %i\n", kingCanGo);
 
             if(kingCanGo && !(rook->hasMoved) && !path_is_blocked(board, rook->currentLocation, newPlace, -inc, 0))
                 ret = true;
         }
-
         else if(flags & VALID_BROADCASTCALL) printf("Piece not caught\n");
     }
     else if(flags & VALID_BROADCASTCALL) printf("Piece is NOT on the board\n");
@@ -326,7 +324,9 @@ bool is_valid_move(Game *board, const Piece *piece, const Location newPlace, int
  * @param inStr   The string the user gave to express their desired move
  * @param flags   Flags for the function
  *
- * @returns true if the move was valid and a piece was moved, false if the move was invalid and nothing moved
+ * @returns a 16-bit integer where bits [15:8] represent where the piece was originally, and bits [7:0] represent where it is now.
+ * 	    But if the move is a castle then bits [15:12] will all be turned on. Bits [11:8] will represent the rank where the
+ *          castling will take place. Bits [7:0] represent a range of values that the piece is spanning.
  */
 int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 {
@@ -355,11 +355,11 @@ int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 
     if(deciphered.p != NULL && is_valid_move(board, deciphered.p, deciphered.loc, flags & VALID_BROADCASTCALL))
     {
-	    bool isCastle;
-	    char PGNMule[10];
-	    uint_fast8_t at_index;
-	    Location old, destination, isOnLoc;
-	    Piece *at, *p, *rook, *pKing, *All[2 * PIECES_PER_SIDE], **team;
+		bool isCastle;
+		char PGNMule[10];
+		uint_fast8_t at_index;
+		Location old, destination, isOnLoc;
+		Piece *at, *p, *rook, *pKing, *All[2 * PIECES_PER_SIDE], **team;
 
 
         if(flags & MOVE_BROADCAST) printf("deciphered.p != NULL and move is valid\n");
@@ -370,21 +370,20 @@ int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 
         if(flags & MOVE_BROADCAST) printf("all pieces gotten\n");
 
-	    location_assign(&isOnLoc, PGNMule[2] - 96, location_getrank(deciphered.p->currentLocation));
+		location_assign(&isOnLoc, PGNMule[2] - 96, location_getrank(deciphered.p->currentLocation));
 
     	at = NULL;
     	if(string_contains(PGNMule, 'x') && piece_is_on(board, deciphered.loc))
     	{
-        	at = piece_at(All, deciphered.loc);
-        	assert(at != NULL);
+            at = piece_at(All, deciphered.loc);
+            assert(at != NULL);
 
         	for(at_index = 0; All[at_index] != at; at_index++);
         	at_index %= 16;
 
         	capture(board, at);
     	}
-    	else if(string_contains(PGNMule, 'x') && !piece_is_on(board, deciphered.loc) && deciphered.p->type == PIECE_PAWN
-    			&& piece_is_on(board, isOnLoc))
+    	else if(string_contains(PGNMule, 'x') && !piece_is_on(board, deciphered.loc) && deciphered.p->type == PIECE_PAWN && piece_is_on(board, isOnLoc))
     	{
 	    	Location check;
         	if(flags & MOVE_BROADCAST) printf("en passant part of process move reached\n");
