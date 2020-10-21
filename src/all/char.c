@@ -9,7 +9,7 @@
  *
  * @return   true if c is a valid horizontal coordinate
  */
-bool char_is_coord(const char c)
+bool char_is_coord(char c)
 {
     return c >= 'a' && c <= 'h';
 }
@@ -22,7 +22,7 @@ bool char_is_coord(const char c)
  *
  * @return   True if the character is valid for PGN
  */
-bool char_is_digit(const char c)
+bool char_is_digit(char c)
 {
     return c > '0' && c < '9';
 }
@@ -34,12 +34,12 @@ bool char_is_digit(const char c)
  * @param c  The character being analyzed
  * @return   True if the character is associated with the PGN for a special piece
  */
-bool char_is_piece(const char c)
+bool char_is_piece(char c)
 {
     return c == 'K' || c == 'Q' || c == 'R' || c == 'N' || c == 'B';
 }
 
-bool char_array_contains(const char *arr, const uintmax_t size, const char c)
+bool char_array_contains(const char *arr, uintmax_t size, char c)
 {
 	bool ret;
 	uintmax_t i;
@@ -87,7 +87,7 @@ void string_copy(char *newstr, const char *str)
  *
  * @return     true if str contains at least 1 instance of c
  */
-bool string_contains(const char *str, const char c)
+bool string_contains(const char *str, char c)
 {
     bool ret;
     uintmax_t i;
@@ -102,7 +102,7 @@ bool string_contains(const char *str, const char c)
     return ret;
 }
 
-uintmax_t string_count_occurences_of_char(const char* str, const char c)
+uintmax_t string_count_occurences_of_char(const char* str, char c)
 {
     uintmax_t i, count;
     count = 0;
@@ -112,7 +112,7 @@ uintmax_t string_count_occurences_of_char(const char* str, const char c)
     return count;
 }
 
-uintmax_t string_add_char(char *str, const char c)
+uintmax_t string_add_char(char *str, char c)
 {
     uintmax_t len;
     len = string_getlen(str);
@@ -138,7 +138,7 @@ uintmax_t string_concatenate(char *str1, const char *str2)
  * @param arr The string to be modified
  * @param index The index of the element to be removed
  */
-void string_remove(char *arr, const uintmax_t index)
+void string_remove(char *arr, uintmax_t index)
 {
     uintmax_t size, i;
     size = string_getlen(arr);
@@ -221,7 +221,7 @@ void tokenize_move(char *str)
  *
  * @returns the number of strings there are in the ptr array after splitting
  */
-uintmax_t string_split(char *ptr, const uintmax_t yWidth, const char *string, const char splitter)
+uintmax_t string_split(char *ptr, uintmax_t yWidth, const char *string, char splitter)
 {
     static uintmax_t ptrindex = 0;
 
@@ -247,7 +247,7 @@ uintmax_t string_split(char *ptr, const uintmax_t yWidth, const char *string, co
     }
 }
 
-uintmax_t string_split_malloc(char **ptr, const char *string, const char splitter)
+uintmax_t string_split_malloc(char **ptr, const char *string, char splitter)
 {
     static uintmax_t ptrindex = 0;
 
