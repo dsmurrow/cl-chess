@@ -1,11 +1,11 @@
 #include "location.h"
 
-uint_fast8_t location_getfile(const Location loc)
+uint_fast8_t location_getfile(Location loc)
 {
 	return (loc & LOCATION_FILE) >> 4;
 }
 
-uint_fast8_t location_getrank(const Location loc)
+uint_fast8_t location_getrank(Location loc)
 {
 	return loc & LOCATION_RANK;
 }
@@ -17,7 +17,7 @@ uint_fast8_t location_getrank(const Location loc)
  * @param ptr The pointer to the location struct that is being modified
  * @param val The value the file is being changed to
  */
-void location_setfile(Location *ptr, const uint_fast8_t val)
+void location_setfile(Location *ptr, uint_fast8_t val)
 {
 	*ptr &= ~LOCATION_FILE;
 
@@ -31,7 +31,7 @@ void location_setfile(Location *ptr, const uint_fast8_t val)
  * @param ptr The pointer to the location struct being modified
  * @param The value of the new rank
  */
-void location_setrank(Location *ptr, const uint_fast8_t val)
+void location_setrank(Location *ptr, uint_fast8_t val)
 {
 	*ptr &= ~LOCATION_RANK;
 
@@ -48,7 +48,7 @@ void location_setrank(Location *ptr, const uint_fast8_t val)
  *
  * @returns true if a location assigned the coordinates x and y is equal to loc
  */
-bool location_equals_coords(const Location loc, const uint_fast8_t x, const uint_fast8_t y)
+bool location_equals_coords(Location loc, uint_fast8_t x, uint_fast8_t y)
 {
 	Location temp;
 	location_assign(&temp, x, y);
@@ -72,7 +72,7 @@ void location_to_coordinate_string(char *coord, Location loc)
 }
 
 
-void location_assign(Location *loc, const uint_fast8_t x, const uint_fast8_t y)
+void location_assign(Location *loc, uint_fast8_t x, uint_fast8_t y)
 {
 	location_setfile(loc, x);
 	location_setrank(loc, y);
