@@ -17,7 +17,7 @@ extern int_fast8_t BLACKTILE;
 extern int_fast8_t WHITEPIECE;
 extern int_fast8_t BLACKPIECE;
 
-static void changecolor(char *type, char *color)
+static void changecolor(const char *type, const char *color)
 {
     int_fast8_t *var, colorarg;
     var = NULL;
@@ -103,7 +103,7 @@ static void changecolor(char *type, char *color)
 }
 
 
-static void placepiece(Game *board, char *i, char *cord)
+static void placepiece(Game *board, const char *i, const char *cord)
 {
     uint_fast8_t index;
     Location loc;
@@ -111,7 +111,7 @@ static void placepiece(Game *board, char *i, char *cord)
 	location_assign(&loc, cord[0] - 96, cord[1] - '0');
 
     index = atoi(i);
-    if(index < 32 && IS_ON_BOARD(location_getfile(loc), location_getrank(loc)))
+    if(index < 2 * PIECES_PER_SIDE && IS_ON_BOARD(location_getfile(loc), location_getrank(loc)))
     {
         int_fast8_t isOn;
         Piece **arr;
@@ -126,8 +126,8 @@ static void placepiece(Game *board, char *i, char *cord)
             match = false;
             for(i = 0; !match && i < 2 * PIECES_PER_SIDE; i++)
             {
-                j = i % 16;
-                arr = i > 15 ? board->Black : board->White;
+                j = i % PIECES_PER_SIDE;
+                arr = i >= PIECES_PER_SIDE ? board->Black : board->White;
                 if(loc == arr[j]->currentLocation)
                 {
                     match = true;
@@ -137,8 +137,8 @@ static void placepiece(Game *board, char *i, char *cord)
             capture(board, piece);
         }
 
-        arr = index < 16 ? board->White : board->Black;
-		arr[index % 16]->currentLocation = loc;
+        arr = index < PIECES_PER_SIDE ? board->White : board->Black;
+		arr[index % PIECES_PER_SIDE]->currentLocation = loc;
     }
 }
 
