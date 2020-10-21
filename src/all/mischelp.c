@@ -67,7 +67,7 @@ void makeColor(int_fast8_t text, int_fast8_t background)
 
 uintmax_t square(intmax_t num)
 {
-    return num * num;
+	return num * num;
 }
 
 /**
@@ -97,20 +97,19 @@ uintmax_t square(intmax_t num)
  */
 uint_fast8_t u_8(uint_fast8_t x, uint_fast8_t y)
 {
-    const uint_fast8_t group[4] = {7, 3, 5, 1}; /* The ordering is different than that of the Cayley table
+	const uint_fast8_t group[4] = {7, 3, 5, 1}; /* The ordering is different than that of the Cayley table
                                                    to accommodate counting from 0 in the array index with
                                                    my coordinates which can only go as low as 1. */
 
-    const uint_fast8_t horiz = group[x % 4]; /* x mod 4 because this is happening to each quadrant of the chessboard. */
-    const uint_fast8_t vertic = group[(y+1) % 4]; /* y is incremented to work into the indexing of the array. Such that
+	const uint_fast8_t horiz = group[x % 4]; /* x mod 4 because this is happening to each quadrant of the chessboard. */
+	const uint_fast8_t vertic = group[(y+1) % 4]; /* y is incremented to work into the indexing of the array. Such that
                                                when x == 1 && y == 8, horiz == 1 && vertic == 1. This makes the corners line up. */
 
-    const uint_fast8_t result = (horiz * vertic) % 8; /* The multiplication mod 8 for U(8). */
+	const uint_fast8_t result = (horiz * vertic) % 8; /* The multiplication mod 8 for U(8). */
 
-    assert(result == group[0] || result == group[1] || result == group[2] || result == group[3]); /* Redundancy, just so if something went wrong
+	assert(result == group[0] || result == group[1] || result == group[2] || result == group[3]); /* Redundancy, just so if something went wrong
                                                                                                      I wouldn't look everywhere before I looked at this function. */
-
-    return result;
+	return result;
 }
 
 /**
@@ -123,21 +122,21 @@ uint_fast8_t u_8(uint_fast8_t x, uint_fast8_t y)
  */
 bool legal_move(char *str)
 {
-    int_fast8_t len, i;
-    bool ret;
+	int_fast8_t len, i;
+	bool ret;
 
-    len = string_getlen(str);
-    ret = char_is_coord(str[len - 2]) && char_is_digit(str[len - 1]);
+	len = string_getlen(str);
+	ret = char_is_coord(str[len - 2]) && char_is_digit(str[len - 1]);
 
-    i = 0;
-    while(str[i] != '\0' && ret)
-    {
-        if(!(char_is_coord(str[i]) || char_is_digit(str[i]) || char_is_piece(str[i])))
-            ret = false;
-        i++;
-    }
+	i = 0;
+	while(str[i] != '\0' && ret)
+	{
+		if(!(char_is_coord(str[i]) || char_is_digit(str[i]) || char_is_piece(str[i])))
+			ret = false;
+		i++;
+	}
 
-    return ret;
+	return ret;
 }
 
 /**
@@ -154,20 +153,19 @@ bool legal_move(char *str)
  */
 Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
 {
-    int_fast8_t i, movelen;
-    char movestr[7];
-    Move ret;
-    Piece **SameTeam;
+	int_fast8_t i, movelen;
+	char movestr[7];
+	Move ret;
+	Piece **SameTeam;
 
-    SameTeam = color == TEAM_WHITE ? board->White : board->Black;
+	SameTeam = color == TEAM_WHITE ? board->White : board->Black;
 
+	ret.p = NULL;
 
-    ret.p = NULL;
-
-    snprintf(movestr, string_getlen(str) + 1, "%s", str);
-    tokenize_move(movestr);
-    movelen = string_getlen(movestr);
-    if(flags & DECIPHER_BROADCAST) printf("decipher_move() called. movestr = %s, movelen = %" PRIiFAST8 ", color = %" PRIdFAST8 "\n", movestr, movelen, color);
+	snprintf(movestr, string_getlen(str) + 1, "%s", str);
+	tokenize_move(movestr);
+	movelen = string_getlen(movestr);
+	if(flags & DECIPHER_BROADCAST) printf("decipher_move() called. movestr = %s, movelen = %" PRIiFAST8 ", color = %" PRIdFAST8 "\n", movestr, movelen, color);
 
     if((movelen == 3 || movelen == 5) && movestr[0] == 'O' && movestr[1] == '-' && movestr[2] == 'O')
     {
@@ -248,15 +246,15 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
                 case 'N':
                 case 'R':
                 {
-                    bool isKnight = movestr[0] == 'N';
-                    Piece *p1 = SameTeam[I_ROOK1 + isKnight];
-                    Piece *p2 = SameTeam[I_ROOK2 - isKnight];
+					bool isKnight = movestr[0] == 'N';
+					Piece *p1 = SameTeam[I_ROOK1 + isKnight];
+					Piece *p2 = SameTeam[I_ROOK2 - isKnight];
 
-                    bool p1_canReach = is_valid_move(board, p1, ret.loc, flags & DECIPHER_BROADCAST);
-                    bool p2_canReach = is_valid_move(board, p2, ret.loc, flags & DECIPHER_BROADCAST);
+					bool p1_canReach = is_valid_move(board, p1, ret.loc, flags & DECIPHER_BROADCAST);
+					bool p2_canReach = is_valid_move(board, p2, ret.loc, flags & DECIPHER_BROADCAST);
 
-                    if(p1_canReach ^ p2_canReach)
-                        ret.p = p1_canReach ? p1 : p2;
+					if(p1_canReach ^ p2_canReach)
+						ret.p = p1_canReach ? p1 : p2;
                     break;
                 }
             }
@@ -269,19 +267,18 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
                 case 'K':
                 case 'B':
                 {
-                    char changed[8];
-                    snprintf(changed, string_getlen(movestr) + 1, "%s", movestr);
-                    string_remove(changed, 1);
+					char changed[8];
+					snprintf(changed, string_getlen(movestr) + 1, "%s", movestr);
+					string_remove(changed, 1);
 
-
-                    ret = decipher_move(board, color, changed, flags);
-                    break;
+					ret = decipher_move(board, color, changed, flags);
+					break;
                 }
                 case 'N':
                 case 'R':
                 {
-                    Piece *p1 = movestr[0] == 'N' ? SameTeam[I_KNIGHT1] : SameTeam[I_ROOK1];
-                    Piece *p2 = movestr[0] == 'N' ? SameTeam[I_KNIGHT2] : SameTeam[I_ROOK2];
+					Piece *p1 = movestr[0] == 'N' ? SameTeam[I_KNIGHT1] : SameTeam[I_ROOK1];
+					Piece *p2 = movestr[0] == 'N' ? SameTeam[I_KNIGHT2] : SameTeam[I_ROOK2];
 
                     bool p1_match = char_is_coord(movestr[1]) ? movestr[1] - 96 == location_getfile(p1->currentLocation) :
                                                                 movestr[1] - '0' == location_getrank(p1->currentLocation);
@@ -289,8 +286,8 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
                     bool p2_match = char_is_coord(movestr[1]) ? movestr[1] - 96 == location_getfile(p2->currentLocation) :
                                                                 movestr[1] - '0' == location_getrank(p2->currentLocation);
 
-                    if((p1_match ^ p2_match) && is_valid_move(board, p1_match ? p1 : p2, ret.loc, flags & VALID_BROADCASTCALL))
-                        ret.p = p1_match ? p1 : p2;
+					if((p1_match ^ p2_match) && is_valid_move(board, p1_match ? p1 : p2, ret.loc, flags & VALID_BROADCASTCALL))
+						ret.p = p1_match ? p1 : p2;
 
                     else if((p1_match && p2_match) && (is_valid_move(board, p1, ret.loc, 0) ^ is_valid_move(board, p2, ret.loc, 0)))
                     {
@@ -324,74 +321,72 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
  */
 void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fast8_t flags)
 {
-    const int_fast8_t longest_basic_PGN = 6;
+	const int_fast8_t longest_basic_PGN = 6;
 
-    if(mover->type == PIECE_KING && location_getfile(mover->currentLocation) - location_getfile(endPoint) == -2 && location_getrank(mover->currentLocation) - location_getrank(endPoint) == 0)
-    {
-        string_copy(destStr, "O-O");
-    }
+	if(mover->type == PIECE_KING && location_getfile(mover->currentLocation) - location_getfile(endPoint) == -2 && location_getrank(mover->currentLocation) - location_getrank(endPoint) == 0)
+	{
+		string_copy(destStr, "O-O");
+	}
     else if(mover->type == PIECE_KING && location_getfile(mover->currentLocation) - location_getfile(endPoint) == 2 && location_getrank(mover->currentLocation) - location_getrank(endPoint) == 0)
-        string_copy(destStr, "O-O-O");
+		string_copy(destStr, "O-O-O");
     else
-    {
-        char coords[3], captureString[2], pieceStr[2], coordSpecifier[2];
-	Move test;
-	uint_fast8_t oppositeColor;
+	{
+		char coords[3], captureString[2], pieceStr[2], coordSpecifier[2];
+		Move test;
+		uint_fast8_t oppositeColor;
 
-        location_to_coordinate_string(coords, endPoint);
+		location_to_coordinate_string(coords, endPoint);
 
+		oppositeColor = ((mover->color) % 2) + 1;
 
-        oppositeColor = ((mover->color) % 2) + 1;
-
-
-        if(piece_is_on(board, endPoint) == oppositeColor)
-            string_copy(captureString, "x");
-        else if(mover->type == PIECE_PAWN && square(location_getfile(mover->currentLocation) - location_getfile(endPoint)) == 1
+		if(piece_is_on(board, endPoint) == oppositeColor)
+			string_copy(captureString, "x");
+		else if(mover->type == PIECE_PAWN && square(location_getfile(mover->currentLocation) - location_getfile(endPoint)) == 1
                 && is_valid_move(board, mover, endPoint, flags & MOVE_BROADCAST))
             string_copy(captureString, "x");
-        else
-            captureString[0] = '\0';
+		else
+			captureString[0] = '\0';
 
 
-        if(mover->type == PIECE_PAWN && captureString[0] == '\0')
-            pieceStr[0] = '\0';
-        else
-        {
-            pieceStr[0] = get_piece_symbol(mover);
-            pieceStr[1] = '\0';
-        }
+		if(mover->type == PIECE_PAWN && captureString[0] == '\0')
+			pieceStr[0] = '\0';
+		else
+		{
+			pieceStr[0] = get_piece_symbol(mover);
+			pieceStr[1] = '\0';
+		}
 
 
         if(mover->type == PIECE_PAWN || mover->type == PIECE_BISHOP || mover->type == PIECE_QUEEN || mover->type == PIECE_KING)
             coordSpecifier[0] = '\0';
-        else
-        {
-            Piece **moverTeam = mover->color == TEAM_WHITE ? board->White : board->Black;
-
-            Piece *p1 = moverTeam[mover->type == PIECE_KNIGHT ? I_KNIGHT1 : I_ROOK1];
-            Piece *p2 = moverTeam[mover->type == PIECE_KNIGHT ? I_KNIGHT2 : I_ROOK2];
-
-            bool p1_valid = is_valid_move(board, p1, endPoint, flags & VALID_BROADCASTCALL);
-            bool p2_valid = is_valid_move(board, p2, endPoint, flags & VALID_BROADCASTCALL);
-
-            if(p1_valid ^ p2_valid || !(p1_valid && p2_valid))
-                coordSpecifier[0] = '\0';
-            else
-            {
-                coordSpecifier[0] = location_getfile(p1->currentLocation) != location_getfile(p2->currentLocation) ? location_getfile(mover->currentLocation) + 96 :
-                                                                                                      			location_getrank(mover->currentLocation) + '0'     ;
-                coordSpecifier[1] = '\0';
+		else
+		{
+			Piece **moverTeam = mover->color == TEAM_WHITE ? board->White : board->Black;
+			
+			Piece *p1 = moverTeam[mover->type == PIECE_KNIGHT ? I_KNIGHT1 : I_ROOK1];
+			Piece *p2 = moverTeam[mover->type == PIECE_KNIGHT ? I_KNIGHT2 : I_ROOK2];
+			
+			bool p1_valid = is_valid_move(board, p1, endPoint, flags & VALID_BROADCASTCALL);
+			bool p2_valid = is_valid_move(board, p2, endPoint, flags & VALID_BROADCASTCALL);
+			
+			if(p1_valid ^ p2_valid || !(p1_valid && p2_valid))
+				coordSpecifier[0] = '\0';
+			else
+			{
+				coordSpecifier[0] = location_getfile(p1->currentLocation) != location_getfile(p2->currentLocation) ? location_getfile(mover->currentLocation) + 96 :
+                                                                                                      			     location_getrank(mover->currentLocation) + '0'     ;
+				coordSpecifier[1] = '\0';
             }
         }
 
-        snprintf(destStr, longest_basic_PGN, "%s%s%s%s", pieceStr, coordSpecifier, captureString, coords);
+		snprintf(destStr, longest_basic_PGN, "%s%s%s%s", pieceStr, coordSpecifier, captureString, coords);
 
-        if(flags & PGN_BROADCAST) printf("destStr = %s\n", destStr);
+		if(flags & PGN_BROADCAST) printf("destStr = %s\n", destStr);
 
-        test = decipher_move(board, mover->color, destStr, flags & DECIPHER_BROADCAST);
-        assert(test.p == mover);
-        assert(endPoint == test.loc);
-    }
+		test = decipher_move(board, mover->color, destStr, flags & DECIPHER_BROADCAST);
+		assert(test.p == mover);
+		assert(endPoint == test.loc);
+	}
 }
 
 /**
@@ -408,29 +403,28 @@ void post_PGN(char *destStr, Game *board, char promoChar)
     uint_fast8_t mate;
 
 
-    if(promoChar != 0)
-    {
-        promotion[0] = '=';
-        promotion[1] = promoChar;
-        promotion[2] = '\0';
-    }
-    else
-        promotion[0] = '\0';
+	if(promoChar != 0)
+	{
+		promotion[0] = '=';
+		promotion[1] = promoChar;
+		promotion[2] = '\0';
+	}
+	else
+		promotion[0] = '\0';
 
-    string_concatenate(destStr, promotion);
+	string_concatenate(destStr, promotion);
 
 
+	mate = check_if_check(board);
 
-    mate = check_if_check(board);
+	if(mate & CHECK_YES)
+	{
+		check[0] = mate & CHECK_MATE ? '#' : '+';
+		check[1] = '\0';
+	}
+	else
+		check[0] = '\0';
 
-    if(mate & CHECK_YES)
-    {
-        check[0] = mate & CHECK_MATE ? '#' : '+';
-        check[1] = '\0';
-    }
-    else
-        check[0] = '\0';
-
-    string_concatenate(destStr, check);
+	string_concatenate(destStr, check);
 }
 
