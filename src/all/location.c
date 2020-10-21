@@ -21,6 +21,8 @@ void location_setfile(Location *ptr, uint_fast8_t val)
 {
 	*ptr &= ~LOCATION_FILE;
 
+	val &= 0xf;
+	val = val > 8 ? 8 : val;
 
 	*ptr |= val << 4;
 }
@@ -35,6 +37,8 @@ void location_setrank(Location *ptr, uint_fast8_t val)
 {
 	*ptr &= ~LOCATION_RANK;
 
+	val &= 0xf;
+	val = val > 8 ? 8 : val;
 
 	*ptr |= val;
 }
