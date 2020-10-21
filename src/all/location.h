@@ -7,16 +7,16 @@
 
 typedef uint_fast8_t Location;
 
-uint_fast8_t location_getfile(const Location);
-uint_fast8_t location_getrank(const Location);
+uint_fast8_t location_getfile(Location);
+uint_fast8_t location_getrank(Location);
 
-void location_setfile(Location*, const uint_fast8_t);
-void location_setrank(Location*, const uint_fast8_t);
+void location_setfile(Location*, uint_fast8_t);
+void location_setrank(Location*, uint_fast8_t);
 
-bool location_equals_coords(const Location, const uint_fast8_t, const uint_fast8_t);
+bool location_equals_coords(Location, uint_fast8_t, uint_fast8_t);
 
 void location_to_coordinate_string(char*, Location);
 
-void location_assign(Location*, const uint_fast8_t, const uint_fast8_t);
+void location_assign(Location*, uint_fast8_t, uint_fast8_t);
 
 #endif /* LOCATION_H_INCLUDED */
