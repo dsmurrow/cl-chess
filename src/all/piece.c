@@ -11,59 +11,59 @@ char *get_piece_name(Piece *p)
 {
     char *pieceName;
 
-    switch(p->type)
-    {
-        case PIECE_PAWN:
-            pieceName = "Pawn";
-            break;
-        case PIECE_BISHOP:
-            pieceName = "Bishop";
-            break;
-        case PIECE_KNIGHT:
-            pieceName = "Knight";
-            break;
-        case PIECE_ROOK:
-            pieceName = "Rook";
-            break;
-        case PIECE_KING:
-            pieceName = "King";
-            break;
-        case PIECE_QUEEN:
-            pieceName = "Queen";
-            break;
-        default:
-            pieceName = "Unknown";
-    }
-    return pieceName;
+	switch(p->type)
+	{
+		case PIECE_PAWN:
+			pieceName = "Pawn";
+			break;
+		case PIECE_BISHOP:
+			pieceName = "Bishop";
+			break;
+		case PIECE_KNIGHT:
+			pieceName = "Knight";
+			break;
+		case PIECE_ROOK:
+			pieceName = "Rook";
+			break;
+		case PIECE_KING:
+			pieceName = "King";
+			break;
+		case PIECE_QUEEN:
+			pieceName = "Queen";
+			break;
+		default:
+			pieceName = "Unknown";
+	}
+	return pieceName;
 }
 
 char get_piece_symbol(Piece *p)
 {
-    char ret;
+	char ret;
 
-    switch(p->type)
-    {
-        case PIECE_PAWN:
-            ret = location_getfile(p->currentLocation) + 96;
-            break;
-        case PIECE_BISHOP:
-            ret = 'B';
-            break;
-        case PIECE_ROOK:
-            ret = 'R';
-            break;
-        case PIECE_KNIGHT:
-            ret = 'N';
-            break;
-        case PIECE_KING:
-            ret = 'K';
-            break;
-        case PIECE_QUEEN:
-            ret = 'Q';
-            break;
-    }
+	switch(p->type)
+	{
+		case PIECE_PAWN:
+			ret = location_getfile(p->currentLocation) + 96;
+			break;
+		case PIECE_BISHOP:
+			ret = 'B';
+			break;
+		case PIECE_ROOK:
+			ret = 'R';
+			break;
+		case PIECE_KNIGHT:
+			ret = 'N';
+			break;
+		case PIECE_KING:
+			ret = 'K';
+			break;
+		case PIECE_QUEEN:
+			ret = 'Q';
+			break;
+	}
 
-    return ret;
+	return ret;
 }
 
 char get_piece_icon(const Piece p)
@@ -104,13 +104,13 @@ char get_piece_icon(const Piece p)
  */
 void get_all_pieces(Piece *All[], Piece *White[], Piece *Black[])
 {
-    uint_fast8_t i, j;
+	uint_fast8_t i, j;
 
-    for(i = 0, j = 0; i < PIECES_PER_SIDE; i++, j++)
-    {
-        All[i] = White[j];
-        All[i + PIECES_PER_SIDE] = Black[j];
-    }
+	for(i = 0, j = 0; i < PIECES_PER_SIDE; i++, j++)
+	{
+		All[i] = White[j];
+		All[i + PIECES_PER_SIDE] = Black[j];
+	}
 }
 
 /**
@@ -123,48 +123,47 @@ void get_all_pieces(Piece *All[], Piece *White[], Piece *Black[])
  */
 Piece *piece_at(Piece **all, Location loc)
 {
-    uint_fast8_t i;
-    Piece *ret = NULL;
+	uint_fast8_t i;
+	Piece *ret = NULL;
 
-    for(i = 0; ret == NULL && i < 2 * PIECES_PER_SIDE; i++)
-        if(all[i]->currentLocation != 0 && all[i]->currentLocation == loc)
-            ret = all[i];
+	for(i = 0; ret == NULL && i < 2 * PIECES_PER_SIDE; i++)
+		if(all[i]->currentLocation != 0 && all[i]->currentLocation == loc)
+			ret = all[i];
 
-    return ret;
+	return ret;
 }
 
 
 char piece_promoted(Piece *p, const char *analString)
 {
-    char ret = 0;
+	char ret = 0;
 
-    uint_fast8_t endVert = p->color == TEAM_WHITE ? 8 : 1;
-    if(p->type == PIECE_PAWN && p->currentLocation != 0 && location_getrank(p->currentLocation) == endVert)
-    {
-        uint_fast8_t i;
-        char pieces[4] = {'N', 'R', 'B', 'Q'};
+	uint_fast8_t endVert = p->color == TEAM_WHITE ? 8 : 1;
+	if(p->type == PIECE_PAWN && p->currentLocation != 0 && location_getrank(p->currentLocation) == endVert)
+	{
+		char pieces[4] = {'N', 'R', 'B', 'Q'};
 
-        ret = 'Q';
-        for(i = 0; ret == 'Q' && i < 4; i++)
-            if(string_contains(analString, pieces[i]))
-                ret = pieces[i];
+		ret = 'Q';
+		for(i = 0; ret == 'Q' && i < 4; i++)
+			if(string_contains(analString, pieces[i]))
+				ret = pieces[i];
 
-        switch(ret)
-        {
-            case 'Q':
-                p->type = PIECE_QUEEN;
-                break;
-            case 'R':
-                p->type = PIECE_ROOK;
-                break;
-            case 'N':
-                p->type = PIECE_KNIGHT;
-                break;
-            case 'B':
-                p->type = PIECE_BISHOP;
-                break;
-        }
-    }
+		switch(ret)
+		{
+			case 'Q':
+				p->type = PIECE_QUEEN;
+				break;
+			case 'R':
+				p->type = PIECE_ROOK;
+				break;
+			case 'N':
+				p->type = PIECE_KNIGHT;
+				break;
+			case 'B':
+				p->type = PIECE_BISHOP;
+				break;
+		}
+	}
 
-    return ret;
+	return ret;
 }
