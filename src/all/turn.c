@@ -73,33 +73,32 @@ void update_latest_move(MoveList *ML, char *newStr)
 
 void remove_latest_move(MoveList *ML)
 {
-        if(ML->firstMove != NULL && ML->num > 0)
-        {
-                assert(ML->LatestMove->next == NULL);
+	if(ML->firstMove != NULL && ML->num > 0)
+	{
+		assert(ML->LatestMove->next == NULL);
 
-                if(ML->num == 1)
-                {
-                        free(ML->LatestMove);
-                        ML->firstMove = NULL;
-                        ML->LatestMove = NULL;
-                        ML->num--;
-                }
-                else if(ML->LatestMove->Black == NULL)
-                {
-                        Turn *latest = ML->LatestMove;
+		if(ML->num == 1)
+		{
+			free(ML->LatestMove);
+			ML->firstMove = NULL;
+			ML->LatestMove = NULL;
+			ML->num--;
+		}
+		else if(ML->LatestMove->Black == NULL)
+		{
+			Turn *latest = ML->LatestMove;
 
-                        Turn *previous = get_move_number(*ML, ML->num - 1);
+			Turn *previous = get_move_number(*ML, ML->num - 1);
                         
-                        free(latest);
-                        previous->next = NULL;
-                        ML->LatestMove = previous;
-                        ML->num--;
-                }
-                else
-                {
-                        ML->LatestMove->Black = NULL;
-                }
-        }
+			free(latest);
+			ML->LatestMove = previous;
+			ML->num--;
+		}
+		else
+		{
+			ML->LatestMove->Black = NULL;
+		}
+	}
 }
 
 void print_moves(MoveList ML)
