@@ -66,7 +66,7 @@ char get_piece_symbol(Piece *p)
 	return ret;
 }
 
-char get_piece_icon(const Piece p)
+char get_piece_icon(Piece p)
 {
 	char ret = '?';
 
