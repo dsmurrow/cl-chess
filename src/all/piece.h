@@ -16,7 +16,7 @@ typedef struct piece
 char piece_promoted(Piece*, const char*);
 char *get_piece_name(Piece*);
 char get_piece_symbol(Piece*);
-char get_piece_icon(const Piece);
+char get_piece_icon(Piece);
 void get_all_pieces(Piece*[], Piece*[], Piece*[]);
 
 Piece *piece_at(Piece**, Location);
