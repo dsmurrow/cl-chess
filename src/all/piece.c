@@ -141,6 +141,7 @@ char piece_promoted(Piece *p, const char *analString)
 	uint_fast8_t endVert = p->color == TEAM_WHITE ? 8 : 1;
 	if(p->type == PIECE_PAWN && p->currentLocation != 0 && location_getrank(p->currentLocation) == endVert)
 	{
+		uint_fast8_t i;
 		char pieces[4] = {'N', 'R', 'B', 'Q'};
 
 		ret = 'Q';
