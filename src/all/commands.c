@@ -144,8 +144,11 @@ static void placepiece(Game *board, const char *i, const char *cord)
 
 void command(Game* board, const char *str)
 {
-	char tokens[5][20];
-	int_fast8_t tokenslen = string_split(&tokens[0][0], 20, str, ' ');
+	const uint_fast8_t words = 5;
+	const uint_fast8_t wordLength = 20;
+
+	char tokens[words][wordLength];
+	int_fast8_t tokenslen = string_split(&tokens[0][0], wordLength, str, ' ');
 
 
 	if(tokenslen == 3 && string_matches(tokens[0], "changecolor"))
