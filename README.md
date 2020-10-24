@@ -12,3 +12,7 @@ I started this project having 8-bits in mind. Even though a C project probably i
 Upon starting the executable you're met with a rudimentary chessboard, an empty move list, and a blinking command line. This game utilizes [portable game notation](https://en.wikipedia.org/wiki/Portable_Game_Notation) and should accept any move string compatible with PGN (and then some!)
 
 You must use an 'x' in your move string when capturing, e.g. "exd5" for a pawn capture, "Qxd7" for a queen capture, etc. Castling is done by typing "O-O" for a king-side castle and "O-O-O" for a queen-side castle. As of right now, the program won't automatically make a move a capture if your piece will land on an enemy piece (even though I'm certain I implemented that months ago) so you *must* specify that you want to perform a capture.
+
+The game has a few rudimentary commands that you can input instead of moves. Every command string starts with a '\*' followed by the command you want to use and whatever parameters it has, if any. Right now I'll tell you the two commands you'll find most useful: "\*quit" and "\*reset". The quit command stops the program and the reset command starts a new game with the list of moves wiped and the pieces back in there starting positions. 
+
+There are other commands but they are more useful for debugging/setting up scenarios. If you want to learn more about the other commands you can looks at the function at the bottom of *src/all/commands.c*.
