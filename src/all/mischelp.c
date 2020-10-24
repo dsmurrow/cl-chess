@@ -5,62 +5,62 @@
 
 void ClearScreen()
 {
-  HANDLE                     hStdOut;
-  CONSOLE_SCREEN_BUFFER_INFO csbi;
-  DWORD                      count;
-  DWORD                      cellCount;
-  COORD                      homeCoords = { 0, 0 };
+	HANDLE                     hStdOut;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	DWORD                      count;
+	DWORD                      cellCount;
+	COORD                      homeCoords = { 0, 0 };
 
-  hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-  if (hStdOut == INVALID_HANDLE_VALUE) return;
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	if (hStdOut == INVALID_HANDLE_VALUE) return;
 
-  /* Get the number of cells in the current buffer */
-  if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )) return;
-  cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+	/* Get the number of cells in the current buffer */
+	if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )) return;
+	cellCount = csbi.dwSize.X *csbi.dwSize.Y;
 
-  /* Fill the entire buffer with spaces */
-  if (!FillConsoleOutputCharacter(
-    hStdOut,
-    (TCHAR) ' ',
-    cellCount,
-    homeCoords,
-    &count
-    )) return;
+	/* Fill the entire buffer with spaces */
+	if (!FillConsoleOutputCharacter(
+		hStdOut,
+		(TCHAR) ' ',
+		cellCount,
+		homeCoords,
+		&count
+	)) return;
 
-  /* Fill the entire buffer with the current colors and attributes */
-  if (!FillConsoleOutputAttribute(
-    hStdOut,
-    csbi.wAttributes,
-    cellCount,
-    homeCoords,
-    &count
-    )) return;
+	/* Fill the entire buffer with the current colors and attributes */
+	if (!FillConsoleOutputAttribute(
+		hStdOut,
+		csbi.wAttributes,
+		cellCount,
+		homeCoords,
+		&count
+	)) return;
 
-  /* Move the cursor home */
-  SetConsoleCursorPosition( hStdOut, homeCoords );
+	/* Move the cursor home */
+	SetConsoleCursorPosition( hStdOut, homeCoords );
 }
 
 void makeColor(int_fast8_t text, int_fast8_t background)
 {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, text + (16 * background));
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, text + (16 * background));
 }
 
 #else /* !_WIN32 */
 void ClearScreen()
 {
-    system("clear");
+	system("clear");
 }
 
 void makeColor(int_fast8_t text, int_fast8_t background)
 {
-    const int_fast8_t textBright = text & BRIGHTMASK ? 60 : 0;
-    const int_fast8_t textColor = (text & COLORMASK) + 30 + textBright;
+	const int_fast8_t textBright = text & BRIGHTMASK ? 60 : 0;
+	const int_fast8_t textColor = (text & COLORMASK) + 30 + textBright;
 
-    const int_fast8_t backBright = background & BRIGHTMASK ? 60 : 0;
-    const int_fast8_t backColor = (background & COLORMASK) + 40 + backBright;
+	const int_fast8_t backBright = background & BRIGHTMASK ? 60 : 0;
+	const int_fast8_t backColor = (background & COLORMASK) + 40 + backBright;
 
-    printf("\033[%" PRIiFAST8 ";%" PRIiFAST8 "m", textColor, backColor);
+	printf("\033[%" PRIiFAST8 ";%" PRIiFAST8 "m", textColor, backColor);
 }
 
 #endif
@@ -167,85 +167,86 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
 	movelen = string_getlen(movestr);
 	if(flags & DECIPHER_BROADCAST) printf("decipher_move() called. movestr = %s, movelen = %" PRIiFAST8 ", color = %" PRIdFAST8 "\n", movestr, movelen, color);
 
-    if((movelen == 3 || movelen == 5) && movestr[0] == 'O' && movestr[1] == '-' && movestr[2] == 'O')
-    {
-        bool kingside, queenside;
+	if((movelen == 3 || movelen == 5) && movestr[0] == 'O' && movestr[1] == '-' && movestr[2] == 'O')
+	{
+		bool kingside, queenside;
 
-        kingside = movelen == 3;
-        queenside = movelen == 5 && movestr[3] == '-' && movestr[4] == 'O';
+		kingside = movelen == 3;
+		queenside = movelen == 5 && movestr[3] == '-' && movestr[4] == 'O';
 
-        if(kingside ^ queenside)
-        {
-            ret.p = SameTeam[I_KING];
+		if(kingside ^ queenside)
+		{
+			ret.p = SameTeam[I_KING];
 			
 			location_setrank(&(ret.loc), location_getrank(ret.p->currentLocation));
 			location_setfile(&(ret.loc), location_getfile(ret.p->currentLocation) + (kingside ? 2 : -2));
-        }
-    }
-    else if(legal_move(movestr))
-    {
+		}
+	}
+	else if(legal_move(movestr))
+	{
 		location_assign(&(ret.loc), movestr[movelen - 2] - 96, movestr[movelen - 1] - '0');
 
-        /* Pawns */
-        if(char_is_coord(movestr[0]) && (movelen == 2 || movelen == 3))
-        {
-            const int_fast8_t deltX = movestr[0] - movestr[movelen - 2];
-            const int_fast8_t verticalInc = color == TEAM_WHITE ? 1 : -1;
-            if(flags & DECIPHER_BROADCAST) printf("Hit pawn branch. deltX = %" PRIdFAST8 ". vertInc = %" PRIdFAST8 "\n", deltX, verticalInc);
+		/* Pawns */
+		if(char_is_coord(movestr[0]) && (movelen == 2 || movelen == 3))
+		{
+			const int_fast8_t deltX = movestr[0] - movestr[movelen - 2];
+			const int_fast8_t verticalInc = color == TEAM_WHITE ? 1 : -1;
+			if(flags & DECIPHER_BROADCAST) printf("Hit pawn branch. deltX = %" PRIdFAST8 ". vertInc = %" PRIdFAST8 "\n", deltX, verticalInc);
 
-            if(movelen == 2)
-            {
-                Location forward;
-                Location forward2;
+			if(movelen == 2)
+			{
+				Location forward;
+				Location forward2;
 
-                bool foundForward = false;
+				bool foundForward = false;
 
-		location_assign(&forward, movestr[0] - 96, movestr[1] - '0' - verticalInc);
-		location_assign(&forward2, location_getfile(forward), location_getrank(forward) - verticalInc);
-                for(i = I_PAWN1; !foundForward && i <= I_PAWN8; i++)
-                {
-                    if(SameTeam[i]->currentLocation != 0 && SameTeam[i]->currentLocation == forward)
-                    {
-                        foundForward = true;
-                        ret.p = SameTeam[i];
-                    }
-                    else if(SameTeam[i]->currentLocation != 0 && SameTeam[i]->currentLocation == forward2)
-                        ret.p = SameTeam[i];
-                }
-            }
-            else if(movelen == 3 && deltX * deltX == 1)
-            {
+				location_assign(&forward, movestr[0] - 96, movestr[1] - '0' - verticalInc);
+				location_assign(&forward2, location_getfile(forward), location_getrank(forward) - verticalInc);
+				for(i = I_PAWN1; !foundForward && i <= I_PAWN8; i++)
+				{
+					if(SameTeam[i]->currentLocation != 0 && SameTeam[i]->currentLocation == forward)
+					{
+						foundForward = true;
+						ret.p = SameTeam[i];
+					}
+					else if(SameTeam[i]->currentLocation != 0 && SameTeam[i]->currentLocation == forward2)
+						ret.p = SameTeam[i];
+				}
+			}
+			else if(movelen == 3 && deltX * deltX == 1)
+			{
+				Location origin;
+				
+				location_assign(&origin, movestr[0] - 96, movestr[movelen - 1] - '0' - verticalInc);
+				
+				if(flags & MOVE_BROADCAST) printf("movelen == 3 branch. origin = {%" PRIuFAST8 ", %" PRIuFAST8 "}\n", location_getfile(origin), location_getrank(origin));
 
-                Location origin;
-                location_assign(&origin, movestr[0] - 96, movestr[movelen - 1] - '0' - verticalInc);
-		if(flags & MOVE_BROADCAST) printf("movelen == 3 branch. origin = {%" PRIuFAST8 ", %" PRIuFAST8 "}\n", location_getfile(origin), location_getrank(origin));
-
-                for(i = I_PAWN1; ret.p == NULL && i <= I_PAWN8; i++)
-                {
-                    if(SameTeam[i]->currentLocation != 0 && origin == SameTeam[i]->currentLocation)
-                        ret.p = SameTeam[i];
-                }
-                if((flags & MOVE_BROADCAST) && ret.p == NULL) printf("ret.p == NULL\n");
-            }
-        }
-        else if(movelen == 3 && char_is_piece(movestr[0])) /* 'Qg3' */
-        {
-            switch(movestr[0])
-            {
-                case 'Q':
-                    ret.p = SameTeam[I_QUEEN];
-                    break;
-                case 'K':
-                    ret.p = SameTeam[I_KING];
-                    break;
-                case 'B':
-                    ret.p = u_8(location_getfile(ret.loc), location_getrank(ret.loc)) <= 3                ?
-                            (color == TEAM_WHITE ? SameTeam[I_BISHOP2] : SameTeam[I_BISHOP1]) :
-                            (color == TEAM_WHITE ? SameTeam[I_BISHOP1] : SameTeam[I_BISHOP2]) ;
-                    break;
-                case 'N':
-                case 'R':
-                {
+				for(i = I_PAWN1; ret.p == NULL && i <= I_PAWN8; i++)
+				{
+					if(SameTeam[i]->currentLocation != 0 && origin == SameTeam[i]->currentLocation)
+						ret.p = SameTeam[i];
+				}
+				if((flags & MOVE_BROADCAST) && ret.p == NULL) printf("ret.p == NULL\n");
+			}
+		}
+		else if(movelen == 3 && char_is_piece(movestr[0])) /* 'Qg3' */
+		{
+			switch(movestr[0])
+			{
+				case 'Q':
+					ret.p = SameTeam[I_QUEEN];
+					break;
+				case 'K':
+					ret.p = SameTeam[I_KING];
+					break;
+				case 'B':
+					ret.p = u_8(location_getfile(ret.loc), location_getrank(ret.loc)) <= 3 ?
+					(color == TEAM_WHITE ? SameTeam[I_BISHOP2] : SameTeam[I_BISHOP1])      :
+					(color == TEAM_WHITE ? SameTeam[I_BISHOP1] : SameTeam[I_BISHOP2])      ;
+					break;
+				case 'N':
+				case 'R':
+				{
 					bool isKnight = movestr[0] == 'N';
 					Piece *p1 = SameTeam[I_ROOK1 + isKnight];
 					Piece *p2 = SameTeam[I_ROOK2 - isKnight];
@@ -255,57 +256,57 @@ Move decipher_move(Game *board, int_fast8_t color, char *str, int_fast8_t flags)
 
 					if(p1_canReach ^ p2_canReach)
 						ret.p = p1_canReach ? p1 : p2;
-                    break;
-                }
-            }
-        }
-        else if(movelen == 4 && char_is_piece(movestr[0]) && (char_is_coord(movestr[1]) || char_is_digit(movestr[1]))) /* 'Rbc3' */
-        {
-            switch(movestr[0])
-            {
-                case 'Q':
-                case 'K':
-                case 'B':
-                {
+					break;
+				}
+			}
+		}
+		else if(movelen == 4 && char_is_piece(movestr[0]) && (char_is_coord(movestr[1]) || char_is_digit(movestr[1]))) /* 'Rbc3' */
+		{
+			switch(movestr[0])
+			{
+				case 'Q':
+				case 'K':
+				case 'B':
+				{
 					char changed[8];
 					snprintf(changed, string_getlen(movestr) + 1, "%s", movestr);
 					string_remove(changed, 1);
 
 					ret = decipher_move(board, color, changed, flags);
 					break;
-                }
-                case 'N':
-                case 'R':
-                {
+				}
+				case 'N':
+				case 'R':
+				{
 					Piece *p1 = movestr[0] == 'N' ? SameTeam[I_KNIGHT1] : SameTeam[I_ROOK1];
 					Piece *p2 = movestr[0] == 'N' ? SameTeam[I_KNIGHT2] : SameTeam[I_ROOK2];
 
-                    bool p1_match = char_is_coord(movestr[1]) ? movestr[1] - 96 == location_getfile(p1->currentLocation) :
-                                                                movestr[1] - '0' == location_getrank(p1->currentLocation);
+					bool p1_match = char_is_coord(movestr[1]) ? 
+					movestr[1] - 96 == location_getfile(p1->currentLocation) :
+					movestr[1] - '0' == location_getrank(p1->currentLocation);
 
-                    bool p2_match = char_is_coord(movestr[1]) ? movestr[1] - 96 == location_getfile(p2->currentLocation) :
-                                                                movestr[1] - '0' == location_getrank(p2->currentLocation);
+					bool p2_match = char_is_coord(movestr[1]) ? 
+					movestr[1] - 96 == location_getfile(p2->currentLocation) :
+					movestr[1] - '0' == location_getrank(p2->currentLocation);
 
 					if((p1_match ^ p2_match) && is_valid_move(board, p1_match ? p1 : p2, ret.loc, flags & VALID_BROADCASTCALL))
 						ret.p = p1_match ? p1 : p2;
 
-                    else if((p1_match && p2_match) && (is_valid_move(board, p1, ret.loc, 0) ^ is_valid_move(board, p2, ret.loc, 0)))
-                    {
-                        char changed[8];
-                        snprintf(changed, string_getlen(movestr) + 1, movestr);
-                        string_remove(changed, 1);
+					else if((p1_match && p2_match) && (is_valid_move(board, p1, ret.loc, 0) ^ is_valid_move(board, p2, ret.loc, 0)))
+					{
+						char changed[8];
+						snprintf(changed, string_getlen(movestr) + 1, movestr);
+						string_remove(changed, 1);
 
+						ret = decipher_move(board, color, changed, flags);
+					}
+				}
+			}
+		}
+	}
 
-                        ret = decipher_move(board, color, changed, flags);
-                    }
-                }
-            }
-        }
-    }
-
-    if(flags & DECIPHER_BROADCAST) printf("ret.p == NULL ? %d\n", ret.p == NULL);
-
-    return ret;
+	if(flags & DECIPHER_BROADCAST) printf("ret.p == NULL ? %d\n", ret.p == NULL);
+	return ret;
 }
 
 /**
@@ -327,9 +328,9 @@ void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fas
 	{
 		string_copy(destStr, "O-O");
 	}
-    else if(mover->type == PIECE_KING && location_getfile(mover->currentLocation) - location_getfile(endPoint) == 2 && location_getrank(mover->currentLocation) - location_getrank(endPoint) == 0)
+	else if(mover->type == PIECE_KING && location_getfile(mover->currentLocation) - location_getfile(endPoint) == 2 && location_getrank(mover->currentLocation) - location_getrank(endPoint) == 0)
 		string_copy(destStr, "O-O-O");
-    else
+	else
 	{
 		char coords[3], captureString[2], pieceStr[2], coordSpecifier[2];
 		Move test;
@@ -341,9 +342,8 @@ void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fas
 
 		if(piece_is_on(board, endPoint) == oppositeColor)
 			string_copy(captureString, "x");
-		else if(mover->type == PIECE_PAWN && square(location_getfile(mover->currentLocation) - location_getfile(endPoint)) == 1
-                && is_valid_move(board, mover, endPoint, flags & MOVE_BROADCAST))
-            string_copy(captureString, "x");
+		else if(mover->type == PIECE_PAWN && square(location_getfile(mover->currentLocation) - location_getfile(endPoint)) == 1 && is_valid_move(board, mover, endPoint, flags & MOVE_BROADCAST))
+			string_copy(captureString, "x");
 		else
 			captureString[0] = '\0';
 
@@ -357,8 +357,8 @@ void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fas
 		}
 
 
-        if(mover->type == PIECE_PAWN || mover->type == PIECE_BISHOP || mover->type == PIECE_QUEEN || mover->type == PIECE_KING)
-            coordSpecifier[0] = '\0';
+		if(mover->type == PIECE_PAWN || mover->type == PIECE_BISHOP || mover->type == PIECE_QUEEN || mover->type == PIECE_KING)
+			coordSpecifier[0] = '\0';
 		else
 		{
 			Piece **moverTeam = mover->color == TEAM_WHITE ? board->White : board->Black;
@@ -373,11 +373,14 @@ void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fas
 				coordSpecifier[0] = '\0';
 			else
 			{
-				coordSpecifier[0] = location_getfile(p1->currentLocation) != location_getfile(p2->currentLocation) ? location_getfile(mover->currentLocation) + 96 :
-                                                                                                      			     location_getrank(mover->currentLocation) + '0'     ;
+				coordSpecifier[0] = 
+				location_getfile(p1->currentLocation) != location_getfile(p2->currentLocation) ? 
+				location_getfile(mover->currentLocation) + 96 :
+				location_getrank(mover->currentLocation) + '0';
+				
 				coordSpecifier[1] = '\0';
-            }
-        }
+			}
+		}
 
 		snprintf(destStr, longest_basic_PGN, "%s%s%s%s", pieceStr, coordSpecifier, captureString, coords);
 
@@ -399,8 +402,8 @@ void to_PGN(char *destStr, Game *board, Piece *mover, Location endPoint, int_fas
  */
 void post_PGN(char *destStr, Game *board, char promoChar)
 {
-    char promotion[3], check[2];
-    uint_fast8_t mate;
+	char promotion[3], check[2];
+	uint_fast8_t mate;
 
 
 	if(promoChar != 0)
