@@ -11,57 +11,57 @@ double functime = 0;
  */
 Game *init_game()
 {
-    uint_fast8_t h, v, pieceType, i, j;
-    bool isWhite;
-    Game *game;
-    Piece *current;
-    Location loc;
+	uint_fast8_t h, v, pieceType, i, j;
+	bool isWhite;
+	Game *game;
+	Piece *current;
+	Location loc;
 
-    /* Initialize Pieces */
-    game = malloc(sizeof(Game));
+	/* Initialize Pieces */
+	game = malloc(sizeof(Game));
 
-    for(i = 0; i < 2 * PIECES_PER_SIDE; i++)
-    {
-        j = i % 16; /* j is the true index in each color's respective array */
-        isWhite = i < 16 ? true : false;
+	for(i = 0; i < 2 * PIECES_PER_SIDE; i++)
+	{
+		j = i % 16; /* j is the true index in each color's respective array */
+		isWhite = i < 16 ? true : false;
 
-        if(j == I_ROOK1 || j == I_ROOK2)
-            pieceType = PIECE_ROOK;
-        else if(j == I_KNIGHT1 || j == I_KNIGHT2)
-            pieceType = PIECE_KNIGHT;
-        else if(j == I_BISHOP1 || j == I_BISHOP2)
-            pieceType = PIECE_BISHOP;
-        else if(j == I_QUEEN)
-            pieceType = PIECE_QUEEN;
-        else if(j == I_KING)
-            pieceType = PIECE_KING;
-        else
-            pieceType = PIECE_PAWN;
+		if(j == I_ROOK1 || j == I_ROOK2)
+			pieceType = PIECE_ROOK;
+		else if(j == I_KNIGHT1 || j == I_KNIGHT2)
+			pieceType = PIECE_KNIGHT;
+		else if(j == I_BISHOP1 || j == I_BISHOP2)
+			pieceType = PIECE_BISHOP;
+		else if(j == I_QUEEN)
+			pieceType = PIECE_QUEEN;
+		else if(j == I_KING)
+			pieceType = PIECE_KING;
+		else
+			pieceType = PIECE_PAWN;
 
 
-        v = 2 - (j / 8); /* vertical position relative to the bottom of the board */
-        h = (j % 8) + 1;
+		v = 2 - (j / 8); /* vertical position relative to the bottom of the board */
+		h = (j % 8) + 1;
 
-        current = isWhite ? (game->White[j] = malloc(sizeof(Piece))) : (game->Black[j] = malloc(sizeof(Piece)));
+		current = isWhite ? (game->White[j] = malloc(sizeof(Piece))) : (game->Black[j] = malloc(sizeof(Piece)));
 
-        current->color = isWhite ? TEAM_WHITE : TEAM_BLACK;
-        current->type = pieceType;
-        current->hasMoved = false;
+		current->color = isWhite ? TEAM_WHITE : TEAM_BLACK;
+		current->type = pieceType;
+		current->hasMoved = false;
 
 		location_assign(&(current->currentLocation), h, isWhite ? v : 9 - v);
-  
-        assert(location_getrank(current->currentLocation) <= 2 || location_getrank(current->currentLocation) >= 7);
-        assert(location_getfile(current->currentLocation) > 0 && location_getfile(current->currentLocation) < 9);
+
+		assert(location_getrank(current->currentLocation) <= 2 || location_getrank(current->currentLocation) >= 7);
+		assert(location_getfile(current->currentLocation) > 0 && location_getfile(current->currentLocation) < 9);
 
 
-        game->pieceLocations[i] = &(current->currentLocation);
-    }
+		game->pieceLocations[i] = &(current->currentLocation);
+	}
 
-    game->Moves.num = 0;
-    game->Moves.firstMove = NULL;
-    game->Moves.LatestMove = NULL;
+	game->Moves.num = 0;
+	game->Moves.firstMove = NULL;
+	game->Moves.LatestMove = NULL;
 
-    return game;
+	return game;
 }
 
 /**
@@ -71,35 +71,35 @@ Game *init_game()
  */
 void free_game(Game *board)
 {
-    uint_fast8_t i, j;
-    Turn *current, *previous;
+	uint_fast8_t i, j;
+	Turn *current, *previous;
 
-    for(i = 0; i < 2 * PIECES_PER_SIDE; i++)
-    {
+	for(i = 0; i < 2 * PIECES_PER_SIDE; i++)
+	{
 		Piece *current;
 
-        j = i % PIECES_PER_SIDE;
-        current = i < PIECES_PER_SIDE ? board->White[j] : board->Black[j];
+		j = i % PIECES_PER_SIDE;
+		current = i < PIECES_PER_SIDE ? board->White[j] : board->Black[j];
 
-        free(current);
-    }
+		free(current);
+	}
 
-    /* Free the moves list */
-    current = board->Moves.firstMove;
-    previous = NULL;
-    while(current != NULL)
-    {
-        free(current->White);
-        if(current->Black != NULL) free(current->Black);
+	/* Free the moves list */
+	current = board->Moves.firstMove;
+	previous = NULL;
+	while(current != NULL)
+	{
+		free(current->White);
+		if(current->Black != NULL) free(current->Black);
 
-        previous = current;
+		previous = current;
 
-        current = previous->next;
+		current = previous->next;
 
-        if(previous != NULL)  free(previous);
-    }
+		if(previous != NULL)  free(previous);
+	}
 
-    free(board);
+	free(board);
 }
 
 /**
@@ -114,165 +114,170 @@ void free_game(Game *board)
  */
 bool is_valid_move(Game *board, const Piece *piece, const Location newPlace, int_fast8_t flags)
 {
-    bool ret;
-    int_fast8_t isOn;
-    uint_fast8_t newH, newV;
+	bool ret;
+	int_fast8_t isOn;
+	uint_fast8_t newH, newV;
 
-    if(flags & VALID_BROADCASTCALL) printf("is_valid_move() was called (color = %" PRIuFAST8 "). newPlace = %c%" PRIuFAST8 "\n", piece->color, (char)(location_getfile(newPlace) + 96), location_getrank(newPlace));
+	if(flags & VALID_BROADCASTCALL) printf("is_valid_move() was called (color = %" PRIuFAST8 "). newPlace = %c%" PRIuFAST8 "\n", piece->color, (char)(location_getfile(newPlace) + 96), location_getrank(newPlace));
 
-    ret = false;
+	ret = false;
 
-    isOn = (flags & VALID_IGNORECOLOR) || (flags & VALID_SELFCHECK) ? 0 : piece_is_on(board, newPlace);
-    if(flags & VALID_BROADCASTCALL) printf("is_valid_move(): isOn = %" PRIuFAST8 "\n", isOn);
+	isOn = (flags & VALID_IGNORECOLOR) || (flags & VALID_SELFCHECK) ? 0 : piece_is_on(board, newPlace);
+	if(flags & VALID_BROADCASTCALL) printf("is_valid_move(): isOn = %" PRIuFAST8 "\n", isOn);
 
-    newH = location_getfile(newPlace);
-    newV = location_getrank(newPlace);
-
-
-
-    /*
-     *  Checks if 1) The new location is on the board at all,
-     *  2) The new location isn't the same as the piece's current location, and
-     *  3) If there is a piece in the new spot, it's not the same color as the piece that's moving
-     */
-    if(piece->currentLocation != 0 && IS_ON_BOARD(newH, newV) && isOn != piece->color)
-    {
-        int_fast8_t deltX, deltY;
-
-        if(flags & VALID_BROADCASTCALL) printf("Location is on board\n");
-
-        deltX = flags & VALID_KINGNOLIMIT ? 1 : location_getfile(newPlace) - location_getfile(piece->currentLocation);
-        deltY = flags & VALID_KINGNOLIMIT ? 1 : location_getrank(newPlace) - location_getrank(piece->currentLocation);
-
-        if(flags & VALID_BROADCASTCALL) printf("created variables in is_valid_move()\n");
-
-        if(piece->type == PIECE_PAWN)
-        {
-            const Location here = piece->currentLocation;
-            const Location nl = newPlace;
-
-            const int_fast8_t isWhite = -((piece->color * 2) - 3);
-
-            const int_fast8_t FORWARD = location_getrank(here) + isWhite;
-            const int_fast8_t FORWARD2 = FORWARD + isWhite;
-            const int_fast8_t LEFT = location_getfile(here) + -isWhite;
-            const int_fast8_t RIGHT = location_getfile(here) + isWhite;
-
-            assert(isWhite == (piece->color == TEAM_WHITE ? 1 : -1));
-            if(flags & VALID_BROADCASTCALL) printf("reached pawns. here = %X, nl = %X\n", here, nl);
+	newH = location_getfile(newPlace);
+	newV = location_getrank(newPlace);
 
 
-            if(location_getrank(nl) == FORWARD)
-            {
-                if(flags & VALID_BROADCASTCALL) printf("nl->vertical == FORWARD\n");
-                if(!(flags & VALID_PAWNATKONLY) && location_getfile(nl) == location_getfile(here) && !piece_is_on(board, nl))
-                    ret = true;
 
-                else if(location_getfile(nl) == LEFT || location_getfile(nl) == RIGHT)
-                {
-                    if(flags & VALID_BROADCASTCALL) printf("diagonal\n");
+	/*
+	 *  Checks if 1) The new location is on the board at all,
+	 *  2) The new location isn't the same as the piece's current location, and
+	 *  3) If there is a piece in the new spot, it's not the same color as the piece that's moving
+	 */
+	if(piece->currentLocation != 0 && IS_ON_BOARD(newH, newV) && isOn != piece->color)
+	{
+		int_fast8_t deltX, deltY;
 
-                    if((flags & VALID_IGNORECOLOR) || piece_is_on(board, nl) || (flags & VALID_PAWNATKONLY))
-                        ret = true;
+		if(flags & VALID_BROADCASTCALL) printf("Location is on board\n");
+
+		deltX = flags & VALID_KINGNOLIMIT ? 1 : location_getfile(newPlace) - location_getfile(piece->currentLocation);
+		deltY = flags & VALID_KINGNOLIMIT ? 1 : location_getrank(newPlace) - location_getrank(piece->currentLocation);
+
+		if(flags & VALID_BROADCASTCALL) printf("created variables in is_valid_move()\n");
+		
+		if(piece->type == PIECE_PAWN)
+		{
+			const Location here = piece->currentLocation;
+			const Location nl = newPlace;
+
+			const int_fast8_t isWhite = -((piece->color * 2) - 3);
+			
+			const int_fast8_t FORWARD = location_getrank(here) + isWhite;
+			const int_fast8_t FORWARD2 = FORWARD + isWhite;
+			const int_fast8_t LEFT = location_getfile(here) + -isWhite;
+			const int_fast8_t RIGHT = location_getfile(here) + isWhite;
+			
+			assert(isWhite == (piece->color == TEAM_WHITE ? 1 : -1));
+			if(flags & VALID_BROADCASTCALL) printf("reached pawns. here = %X, nl = %X\n", here, nl);
+
+			
+			if(location_getrank(nl) == FORWARD)
+			{
+				if(flags & VALID_BROADCASTCALL) printf("nl->vertical == FORWARD\n");
+		    
+				if(!(flags & VALID_PAWNATKONLY) && location_getfile(nl) == location_getfile(here) && !piece_is_on(board, nl))
+					ret = true;
+				else if(location_getfile(nl) == LEFT || location_getfile(nl) == RIGHT)
+				{
+					if(flags & VALID_BROADCASTCALL) printf("diagonal\n");
+
+					if((flags & VALID_IGNORECOLOR) || piece_is_on(board, nl) || (flags & VALID_PAWNATKONLY))
+						ret = true;
 
 
-                    /* en passant */
-                    else if(board->Moves.firstMove != NULL)
-                    {
+					/* en passant */
+					else if(board->Moves.firstMove != NULL)
+					{
 						char *last;
 						bool is_a_two_mover;
 		 				Turn *current;
 
-                        if(flags & VALID_BROADCASTCALL) printf("en passant, LatestMove = (%" PRIuMAX "\t%s\t%s)\n", board->Moves.LatestMove->number, board->Moves.LatestMove->White, board->Moves.LatestMove->Black);
-                        last = piece->color == TEAM_BLACK ? board->Moves.LatestMove->White : board->Moves.LatestMove->Black;
-                        if(flags & VALID_BROADCASTCALL) printf("got last (%s)\n", last);
+						if(flags & VALID_BROADCASTCALL) 
+							printf("en passant, LatestMove = (%" PRIuMAX "\t%s\t%s)\n", board->Moves.LatestMove->number, board->Moves.LatestMove->White, board->Moves.LatestMove->Black);
+						
+						last = piece->color == TEAM_BLACK ? board->Moves.LatestMove->White : board->Moves.LatestMove->Black;
+						
+						if(flags & VALID_BROADCASTCALL) printf("got last (%s)\n", last);
 
-                        is_a_two_mover = string_getlen(last) == 2 && last[0] - 96 == location_getfile(nl) && last[1] - '0' == location_getrank(here);
+						is_a_two_mover = string_getlen(last) == 2 && last[0] - 96 == location_getfile(nl) && last[1] - '0' == location_getrank(here);
 
-                        current = board->Moves.firstMove;
-                        if(flags & VALID_BROADCASTCALL) printf("is_a_two_mover = %i, trn will have to look like %c%c, last = %s\n", is_a_two_mover, (char)(location_getfile(nl) + 96), FORWARD + '0', last);
-                        while(is_a_two_mover && current != NULL)
-                        {
-                            char *trn = piece->color == TEAM_BLACK ? current->White : current->Black;
+						current = board->Moves.firstMove;
+						
+						if(flags & VALID_BROADCASTCALL)
+							printf("is_a_two_mover = %i, trn will have to look like %c%c, last = %s\n", is_a_two_mover, (char)(location_getfile(nl) + 96), FORWARD + '0', last);
+                        
+						while(is_a_two_mover && current != NULL)
+						{
+							char *trn = piece->color == TEAM_BLACK ? current->White : current->Black;
 
-                            if(string_getlen(trn) == 2 && trn[0] - 96 == location_getfile(nl) && trn[1] - '0' == FORWARD)
-                                is_a_two_mover = false;
-
-
-                            current = current->next;
-                        }
-                        if(flags & VALID_BROADCASTCALL) printf("out of two_mover loop");
-                        if(is_a_two_mover)
-                            ret = true;
-                        if(flags & VALID_BROADCASTCALL) printf("end of en passant\n");
-                    }
-
-                }
-
-            }
-            else if(!(flags & VALID_PAWNATKONLY) && !(piece->hasMoved) &&           /* e5 */
-                    location_getrank(nl) == FORWARD2 && location_getfile(nl) == location_getfile(here) &&
-                    !path_is_blocked(board, here, nl, 0, isWhite))
-            {
-                if(flags & VALID_BROADCASTCALL) printf("FORWARD2 block reached\n");
-                ret = true;
-            }
-        }
-
-        /* BISHOPS, ROOKS, KNIGHTS, & QUEENS */
-        else if(piece->type & PIECE_BISHOP || piece->type & PIECE_ROOK || piece->type == PIECE_KNIGHT)
-        {
-	    	int_fast8_t xInc, yInc, intslope;
+							if(string_getlen(trn) == 2 && trn[0] - 96 == location_getfile(nl) && trn[1] - '0' == FORWARD)
+								is_a_two_mover = false;
 
 
-            if(flags & VALID_BROADCASTCALL) printf("reached bish/queen/rook/knight part\n");
-            xInc = deltX >= -1 && deltX <= 1 ? deltX : (deltX > 1 ? 1 : -1);
-            yInc = deltY >= -1 && deltY <= 1 ? deltY : (deltY > 1 ? 1 : -1);
+							current = current->next;
+						}
+						if(flags & VALID_BROADCASTCALL) printf("out of two_mover loop");
+						if(is_a_two_mover)
+							ret = true;
+						if(flags & VALID_BROADCASTCALL) printf("end of en passant\n");
+					}
+				}
+
+			}
+			else if(!(flags & VALID_PAWNATKONLY) && !(piece->hasMoved) &&           /* e5 */
+				location_getrank(nl) == FORWARD2 && location_getfile(nl) == location_getfile(here) &&
+				!path_is_blocked(board, here, nl, 0, isWhite))
+			{
+				if(flags & VALID_BROADCASTCALL) printf("FORWARD2 block reached\n");
+				ret = true;
+			}
+		}
+
+		/* BISHOPS, ROOKS, KNIGHTS, & QUEENS */
+		else if(piece->type & PIECE_BISHOP || piece->type & PIECE_ROOK || piece->type == PIECE_KNIGHT)
+		{
+			int_fast8_t xInc, yInc, intslope;
+
+
+			if(flags & VALID_BROADCASTCALL) printf("reached bish/queen/rook/knight part\n");
+			xInc = deltX >= -1 && deltX <= 1 ? deltX : (deltX > 1 ? 1 : -1);
+			yInc = deltY >= -1 && deltY <= 1 ? deltY : (deltY > 1 ? 1 : -1);
 
 
 
-            if(deltX == 0 || deltY == 0)
-                intslope = 0;
-            else if(square(deltX) == square(deltY))
-                intslope = 1;
-            else if(((square(deltX) == 1) ^ (bool)(square(deltY) == 1)) && ((square(deltX) == 4) ^ (bool)(square(deltY) == 4)))
-                intslope = 2;
+			if(deltX == 0 || deltY == 0)
+				intslope = 0;
+			else if(square(deltX) == square(deltY))
+				intslope = 1;
+			else if(((square(deltX) == 1) ^ (bool)(square(deltY) == 1)) && ((square(deltX) == 4) ^ (bool)(square(deltY) == 4)))
+				intslope = 2;
 
-            if(flags & VALID_BROADCASTCALL) printf("Slope calculated\n");
+			if(flags & VALID_BROADCASTCALL) printf("Slope calculated\n");
 
-            if( ((intslope == 1 && piece->type & PIECE_BISHOP) || (intslope == 0 && piece->type & PIECE_ROOK)) &&
-                !path_is_blocked(board, piece->currentLocation, newPlace, xInc, yInc) )
-                ret = true;
-            else if(square(deltX) <= 4 && square(deltY) <= 4 && piece->type == PIECE_KNIGHT && intslope == 2)
-                ret = true;
-        }
+			if( ((intslope == 1 && piece->type & PIECE_BISHOP) || (intslope == 0 && piece->type & PIECE_ROOK)) &&
+			   !path_is_blocked(board, piece->currentLocation, newPlace, xInc, yInc) )
+				ret = true;
+			else if(square(deltX) <= 4 && square(deltY) <= 4 && piece->type == PIECE_KNIGHT && intslope == 2)
+				ret = true;
+		}
 
 
-        /* KING */
-        else if(piece->type == PIECE_KING && square(deltX) <= 1 && square(deltY) <= 1)
-        {
-            if(flags & VALID_BROADCASTCALL) printf("Got to king\n");
+		/* KING */
+		else if(piece->type == PIECE_KING && square(deltX) <= 1 && square(deltY) <= 1)
+		{
+			if(flags & VALID_BROADCASTCALL) printf("Got to king\n");
 
-            ret = true;
-            if(!(flags & VALID_IGNORECOLOR))
-            {
-                Piece **EnemyPieces = piece->color == TEAM_WHITE ? board->Black : board->White;
-                uint_fast8_t i;
-                for(i = 0; ret && i < PIECES_PER_SIDE; i++)
-                {
-                    /* Check if any enemy pieces can attack the new location. Then checks if that piece is on the new location. */
-                    if(is_valid_move(board, EnemyPieces[i], newPlace, VALID_IGNORECOLOR | VALID_PAWNATKONLY) &&
-                       EnemyPieces[i]->currentLocation != newPlace)
-                    {
-                        if(flags & VALID_BROADCASTCALL) printf("not valid king move: i = %" PRIuFAST8 "\n", i);
-                        ret = false;
-                    }
-                }
-            }
-        }
-        /* CASTLING */
-        else if(piece->type == PIECE_KING && !(piece->hasMoved) && (newH == 3 || newH == 7) && deltY == 0)
-        {
+			ret = true;
+			if(!(flags & VALID_IGNORECOLOR))
+			{
+				Piece **EnemyPieces = piece->color == TEAM_WHITE ? board->Black : board->White;
+				uint_fast8_t i;
+				for(i = 0; ret && i < PIECES_PER_SIDE; i++)
+				{
+					/* Check if any enemy pieces can attack the new location. Then checks if that piece is on the new location. */
+					if(is_valid_move(board, EnemyPieces[i], newPlace, VALID_IGNORECOLOR | VALID_PAWNATKONLY) &&
+					   EnemyPieces[i]->currentLocation != newPlace)
+					{
+						if(flags & VALID_BROADCASTCALL) printf("not valid king move: i = %" PRIuFAST8 "\n", i);
+						ret = false;
+					}
+				}
+			}
+		}
+		/* CASTLING */
+		else if(piece->type == PIECE_KING && !(piece->hasMoved) && (newH == 3 || newH == 7) && deltY == 0)
+		{
 			bool kingCanGo;
 			int_fast8_t inc;
 			uint_fast8_t i, rookIndex;
@@ -301,19 +306,19 @@ bool is_valid_move(Game *board, const Piece *piece, const Location newPlace, int
 				{
 					kingCanGo = false;
 				}
-        	}
-            if(flags & VALID_BROADCASTCALL) printf("Completed castle loops: kingCanGo = %i\n", kingCanGo);
+			}
+			if(flags & VALID_BROADCASTCALL) printf("Completed castle loops: kingCanGo = %i\n", kingCanGo);
 
-            if(kingCanGo && !(rook->hasMoved) && !path_is_blocked(board, rook->currentLocation, newPlace, -inc, 0))
-                ret = true;
-        }
-        else if(flags & VALID_BROADCASTCALL) printf("Piece not caught\n");
-    }
-    else if(flags & VALID_BROADCASTCALL) printf("Piece is NOT on the board\n");
+			if(kingCanGo && !(rook->hasMoved) && !path_is_blocked(board, rook->currentLocation, newPlace, -inc, 0))
+				ret = true;
+		}
+		else if(flags & VALID_BROADCASTCALL) printf("Piece not caught\n");
+	}
+	else if(flags & VALID_BROADCASTCALL) printf("Piece is NOT on the board\n");
+	
+	if(flags & VALID_BROADCASTCALL) printf("Move is %s valid\n", ret ? "" : "NOT");
 
-    if(flags & VALID_BROADCASTCALL) printf("Move is %s valid\n", ret ? "" : "NOT");
-
-    return ret;
+	return ret;
 }
 
 /**
@@ -495,30 +500,30 @@ int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 
 void print_pieces(Game *board, int_fast8_t flags)
 {
-    Piece *current;
-    uint_fast8_t i, j;
+	Piece *current;
+	uint_fast8_t i, j;
 
-    for(j = 0; j < 2; j++)
-    {
-        printf("%s:\n-------------\n", j == 0 ? "White pieces" : "Black pieces");
-        for(i = 0; i < PIECES_PER_SIDE; i++)
-        {
-	    char coordinate[3];
+	for(j = 0; j < 2; j++)
+	{
+		printf("%s:\n-------------\n", j == 0 ? "White pieces" : "Black pieces");
+		for(i = 0; i < PIECES_PER_SIDE; i++)
+		{
+			char coordinate[3];
+			
+			current = j == 0 ? board->White[i] : board->Black[i];
 
-            current = j == 0 ? board->White[i] : board->Black[i];
+			printf("%s\n", get_piece_name(current));
 
-            printf("%s\n", get_piece_name(current));
+			location_to_coordinate_string(coordinate, current->currentLocation);
 
-            location_to_coordinate_string(coordinate, current->currentLocation);
+			printf("Location: %s\n", coordinate);
+			
+			if(flags & PP_SHOWCAPTURED) printf("Captured: %s\n", current->currentLocation == 0 ? "yes" : "no");
 
-            printf("Location: %s\n", coordinate);
-
-            if(flags & PP_SHOWCAPTURED) printf("Captured: %s\n", current->currentLocation == 0 ? "yes" : "no");
-
-            printf("\n");
-        }
-        printf("\n");
-    }
+			printf("\n");
+		}
+		printf("\n");
+	}
 }
 
 
