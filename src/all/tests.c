@@ -79,119 +79,118 @@ void test_macros()
 
 void test_piece_placement()
 {
-    Game *board = init_game();
+	Game *board = init_game();
 
-    Piece **WhitePieces = board->White;
-    Piece **BlackPieces = board->Black;
+	Piece **WhitePieces = board->White;
+	Piece **BlackPieces = board->Black;
 
-    uint_fast8_t i;
-    Piece *curW, *curB;
+	uint_fast8_t i;
+	Piece *curW, *curB;
 
-    /* Initialize an array making an array to map the macros to piece types */
-    uint_fast8_t pieceMap[PIECES_PER_SIDE];
-    for(i = 0; i < PIECES_PER_SIDE; i++)
-    {
-        switch(i)
-        {
-            case I_PAWN1:
-            case I_PAWN2:
-            case I_PAWN3:
-            case I_PAWN4:
-            case I_PAWN5:
-            case I_PAWN6:
-            case I_PAWN7:
-            case I_PAWN8:
-                pieceMap[i] = PIECE_PAWN;
-                break;
-            case I_ROOK1:
-            case I_ROOK2:
-                pieceMap[i] = PIECE_ROOK;
-                break;
-            case I_KNIGHT1:
-            case I_KNIGHT2:
-                pieceMap[i] = PIECE_KNIGHT;
-                break;
-            case I_BISHOP1:
-            case I_BISHOP2:
-                pieceMap[i] = PIECE_BISHOP;
-                break;
-            case I_QUEEN:
-                pieceMap[i] = PIECE_QUEEN;
-                break;
-            case I_KING:
-                pieceMap[i] = PIECE_KING;
-                break;
-            default:
-                pieceMap[i] = 6;
-        }
+	/* Initialize an array making an array to map the macros to piece types */
+	uint_fast8_t pieceMap[PIECES_PER_SIDE];
+	for(i = 0; i < PIECES_PER_SIDE; i++)
+	{
+		switch(i)
+		{
+			case I_PAWN1:
+			case I_PAWN2:
+			case I_PAWN3:
+			case I_PAWN4:
+			case I_PAWN5:
+			case I_PAWN6:
+			case I_PAWN7:
+			case I_PAWN8:
+				pieceMap[i] = PIECE_PAWN;
+				break;
+			case I_ROOK1:
+			case I_ROOK2:
+				pieceMap[i] = PIECE_ROOK;
+				break;
+			case I_KNIGHT1:
+			case I_KNIGHT2:
+				pieceMap[i] = PIECE_KNIGHT;
+				break;
+			case I_BISHOP1:
+			case I_BISHOP2:
+				pieceMap[i] = PIECE_BISHOP;
+				break;
+			case I_QUEEN:
+				pieceMap[i] = PIECE_QUEEN;
+				break;
+			case I_KING:
+				pieceMap[i] = PIECE_KING;
+				break;
+			default:
+				pieceMap[i] = 6;
+		}
 
-    }
+	}
 
-    /* Testing all pieces are in the right place */
-    for(i = 0; i < PIECES_PER_SIDE; i++)
-    {   
- 	Location temp;
-	uint_fast8_t x, y;
+	/* Testing all pieces are in the right place */
+	for(i = 0; i < PIECES_PER_SIDE; i++)
+	{   
+		Location temp;
+		uint_fast8_t x, y;
 
-        assert(pieceMap[i] != 6);
+		assert(pieceMap[i] != 6);
 
-        curW = WhitePieces[i];
-        curB = BlackPieces[i];
+		curW = WhitePieces[i];
+		curB = BlackPieces[i];
 
-        assert(curW->type == pieceMap[i]);
-        assert(curB->type == pieceMap[i]);
+		assert(curW->type == pieceMap[i]);
+		assert(curB->type == pieceMap[i]);
 
-        assert(curW->hasMoved == false);
-        assert(curW->hasMoved == false);
+		assert(curW->hasMoved == false);
+		assert(curW->hasMoved == false);
 
-        x = (i % 8) + 1;
-        y = 2 - (i / 8);
+		x = (i % 8) + 1;
+		y = 2 - (i / 8);
 
 
-        assert(location_equals_coords(curW->currentLocation, x, y));
-        assert(location_equals_coords(curB->currentLocation, x, 9 - y));
+		assert(location_equals_coords(curW->currentLocation, x, y));
+		assert(location_equals_coords(curB->currentLocation, x, 9 - y));
 
-	location_assign(&temp, x, y);
-        assert(piece_is_on(board, temp));
-    }
-
-    free_game(board);
+		location_assign(&temp, x, y);
+		assert(piece_is_on(board, temp));
+	}
+	free_game(board);
 }
 
 void test_castling()
 {
-    uint_fast8_t i;
-    Location kingside, queenside;
-    Game *board = init_game();
+	uint_fast8_t i;
+	Location kingside, queenside;
+	Game *board = init_game();
 
-    Piece **WhitePieces = board->White;
-    Piece **BlackPieces = board->Black;
+	Piece **WhitePieces = board->White;
+	Piece **BlackPieces = board->Black;
 
 
-    /* Remove every piece between the kings and the rooks. */
-    for(i = I_KNIGHT1; i < I_ROOK2; i++)
-    {
-        if(WhitePieces[i]->type != PIECE_KING)
-        {
-            capture(board, WhitePieces[i]);
+	/* Remove every piece between the kings and the rooks. */
+	for(i = I_KNIGHT1; i < I_ROOK2; i++)
+	{
+		if(WhitePieces[i]->type != PIECE_KING)
+		{
+			capture(board, WhitePieces[i]);
 			capture(board, BlackPieces[i]);
-    	}
-    }
+		}
+	}
 
-    location_assign(&kingside, 7, 1);
-    assert(is_valid_move(board, WhitePieces[I_KING], kingside, 0));
+	location_assign(&kingside, 7, 1);
+	assert(is_valid_move(board, WhitePieces[I_KING], kingside, 0));
 
-    location_assign(&queenside, 3, 1);
-    assert(is_valid_move(board, WhitePieces[I_KING], queenside, 0));
+	location_assign(&queenside, 3, 1);
+	assert(is_valid_move(board, WhitePieces[I_KING], queenside, 0));
 
 
-    location_setrank(&kingside, 8);
-    assert(is_valid_move(board, BlackPieces[I_KING], kingside, 0));
+	location_setrank(&kingside, 8);
+	assert(is_valid_move(board, BlackPieces[I_KING], kingside, 0));
 
-    location_assign(&queenside, 3, 8);
-    assert(is_valid_move(board, BlackPieces[I_KING], queenside, 0));
+	location_assign(&queenside, 3, 8);
+	assert(is_valid_move(board, BlackPieces[I_KING], queenside, 0));
 
-    free_game(board);
+	free_game(board);
 }
 
 
@@ -250,49 +249,47 @@ void test_pawn_capture()
 
 void test_decipher()
 {
-    Game *board = init_game();
+	Game *board = init_game();
 
-    Move a;
+	Move a;
 
-    Piece **WhitePieces = board->White;
-    Piece **BlackPieces = board->Black;
+	Piece **WhitePieces = board->White;
+	Piece **BlackPieces = board->Black;
 
-    /* test normal pawn movements */
-    a = decipher_move(board, TEAM_WHITE, "e4", 0);
-    assert(a.p == WhitePieces[I_PAWN5]);
-    assert(location_getfile(a.loc) == 5);
-    assert(location_getrank(a.loc) == 4);
-
-
-
-    a = decipher_move(board, TEAM_BLACK, "b6", 0);
-    assert(a.p == BlackPieces[I_PAWN2]);
-    assert(location_equals_coords(a.loc, 2, 6));
+	/* test normal pawn movements */
+	a = decipher_move(board, TEAM_WHITE, "e4", 0);
+	assert(a.p == WhitePieces[I_PAWN5]);
+	assert(location_getfile(a.loc) == 5);
+	assert(location_getrank(a.loc) == 4);
 
 
 
-    /* test castling */
-    a = decipher_move(board, TEAM_WHITE, "O-O", 0);
-    assert(a.p == WhitePieces[I_KING]);
-    assert(location_equals_coords(a.loc, 7, 1));
+	a = decipher_move(board, TEAM_BLACK, "b6", 0);
+	assert(a.p == BlackPieces[I_PAWN2]);
+	assert(location_equals_coords(a.loc, 2, 6));
 
 
 
-    a = decipher_move(board, TEAM_BLACK, "O-O-O", 0);
-    assert(a.p == BlackPieces[I_KING]);
-    assert(location_equals_coords(a.loc, 3, 8));
+	/* test castling */
+	a = decipher_move(board, TEAM_WHITE, "O-O", 0);
+	assert(a.p == WhitePieces[I_KING]);
+	assert(location_equals_coords(a.loc, 7, 1));
 
 
 
-    /* test back row moves */
-    a = decipher_move(board, TEAM_WHITE, "Qxb5", 0);
-    assert(a.p == WhitePieces[I_QUEEN]);
-    assert(location_equals_coords(a.loc, 2, 5));
+	a = decipher_move(board, TEAM_BLACK, "O-O-O", 0);
+	assert(a.p == BlackPieces[I_KING]);
+	assert(location_equals_coords(a.loc, 3, 8));
 
 
 
+	/* test back row moves */
+	a = decipher_move(board, TEAM_WHITE, "Qxb5", 0);
+	assert(a.p == WhitePieces[I_QUEEN]);
+	assert(location_equals_coords(a.loc, 2, 5));
 
-    free_game(board);
+
+	free_game(board);
 }
 
 void test_string_remove()
@@ -361,133 +358,133 @@ void test_tokenize()
 
 void test_move()
 {
-    Game *board = init_game();
-    Location f3;
+	Game *board = init_game();
+	Location f3;
 	
 	location_assign(&f3, 6, 3);
 
-    assert(!process_move(board, "b7", 0));
+	assert(!process_move(board, "b7", 0));
 
-    assert(process_move(board, "b3", 0));
-    assert(process_move(board, "b6", 0));
+	assert(process_move(board, "b3", 0));
+	assert(process_move(board, "b6", 0));
 
-    assert(process_move(board, "Nf3", 0));
-    assert(process_move(board, "Nc6", 0));
+	assert(process_move(board, "Nf3", 0));
+	assert(process_move(board, "Nc6", 0));
 
-    assert(piece_is_on(board, f3));
-    assert(!is_valid_move(board, board->White[5], f3, 0));
+	assert(piece_is_on(board, f3));
+	assert(!is_valid_move(board, board->White[5], f3, 0));
 
-    assert(process_move(board, "Ba3", 0));
-    assert(process_move(board, "f5", 0));
+	assert(process_move(board, "Ba3", 0));
+	assert(process_move(board, "f5", 0));
 
 	location_setfile(&(board->White[I_QUEEN]->currentLocation), location_getfile(board->White[I_QUEEN]->currentLocation) + 1);
 	location_setrank(&(board->White[I_QUEEN]->currentLocation), location_getrank(board->White[I_QUEEN]->currentLocation) + 2);
 
-    assert(board->Black[5]->type == PIECE_PAWN);
-    assert(!is_valid_move(board, board->Black[5], f3, 0));
+	assert(board->Black[5]->type == PIECE_PAWN);
+	assert(!is_valid_move(board, board->Black[5], f3, 0));
 
-    assert(process_move(board, "Qxe7", 0));
-    assert(board->White[I_QUEEN]->currentLocation != 0);
-    assert(board->Black[I_PAWN5]->currentLocation == 0);
-    assert(process_move(board, "Qe7", 0));
+	assert(process_move(board, "Qxe7", 0));
+	assert(board->White[I_QUEEN]->currentLocation != 0);
+	assert(board->Black[I_PAWN5]->currentLocation == 0);
+	assert(process_move(board, "Qe7", 0));
 
-    assert(process_move(board, "Bxe7", 0));
-    assert(process_move(board, "Kxe7", 0));
+	assert(process_move(board, "Bxe7", 0));
+	assert(process_move(board, "Kxe7", 0));
 
-    assert(process_move(board, "Ng5", 0));
-    assert(!process_move(board, "Kf7", 0));
-    assert(process_move(board, "d5", 0));
+	assert(process_move(board, "Ng5", 0));
+	assert(!process_move(board, "Kf7", 0));
+	assert(process_move(board, "d5", 0));
 
-    assert(process_move(board, "e4", 0));
-    assert(process_move(board, "fxe4", 0));
+	assert(process_move(board, "e4", 0));
+	assert(process_move(board, "fxe4", 0));
 
-    assert(process_move(board, "Ne4", 0));
-    assert(process_move(board, "dxe4", 0));
+	assert(process_move(board, "Ne4", 0));
+	assert(process_move(board, "dxe4", 0));
 
-    free_game(board);
-
-
-    board = init_game();
-
-    assert(process_move(board, "e4", 0));
-    assert(process_move(board, "d5", 0));
-
-    assert(process_move(board, "Bd3", 0));
-    assert(process_move(board, "e5", 0));
-
-    assert(process_move(board, "Nf3", 0));
-    assert(process_move(board, "Bc5", 0));
-
-    assert(process_move(board, "O-O", 0));
-    assert(process_move(board, "Bxf2", 0));
-
-    assert(!process_move(board, "a3", 0));
+	free_game(board);
 
 
-    free_game(board);
+	board = init_game();
+
+	assert(process_move(board, "e4", 0));
+	assert(process_move(board, "d5", 0));
+
+	assert(process_move(board, "Bd3", 0));
+	assert(process_move(board, "e5", 0));
+
+	assert(process_move(board, "Nf3", 0));
+	assert(process_move(board, "Bc5", 0));
+
+	assert(process_move(board, "O-O", 0));
+	assert(process_move(board, "Bxf2", 0));
+
+	assert(!process_move(board, "a3", 0));
 
 
-
-    board = init_game();
-
-    assert(process_move(board, "e4", 0));
-    assert(process_move(board, "d5", 0));
-
-    assert(process_move(board, "f4", 0));
-    assert(process_move(board, "dxe4", 0));
-
-    assert(process_move(board, "d4", 0));
-    assert(process_move(board, "exd3", 0));
-
-    free_game(board);
-
-
-    board = init_game();
-
-    assert(process_move(board, "e4", 0));
-    assert(process_move(board, "a5", 0));
-
-    assert(process_move(board, "e5", 0));
-    assert(process_move(board, "d5", 0));
-
-    assert(process_move(board, "exd6", 0));
-
-    free_game(board);
+	free_game(board);
 
 
 
-    board = init_game();
+	board = init_game();
 
-    assert(process_move(board, "d4", 0));
-    assert(process_move(board, "d5", 0));
+	assert(process_move(board, "e4", 0));
+	assert(process_move(board, "d5", 0));
 
-    assert(process_move(board, "Nc3", 0));
-    assert(process_move(board, "c6", 0));
+	assert(process_move(board, "f4", 0));
+	assert(process_move(board, "dxe4", 0));
 
-    assert(process_move(board, "e4", 0));
-    assert(process_move(board, "Nf6", 0));
+	assert(process_move(board, "d4", 0));
+	assert(process_move(board, "exd3", 0));
 
-    assert(process_move(board, "Bd3", 0));
-    assert(process_move(board, "Na6", 0));
-
-    assert(process_move(board, "Nf3", 0));
-    assert(process_move(board, "Bg4", 0));
-
-    assert(process_move(board, "O-O", 0));
-    assert(process_move(board, "Qc7", 0));
-
-    assert(process_move(board, "Re1", 0));
-    assert(process_move(board, "b6", 0));
-
-    free_game(board);
+	free_game(board);
 
 
-    board = init_game();
+	board = init_game();
 
-    command(board, "place 0 h7");
-    assert(process_move(board, "hxg8=B+", 0));
+	assert(process_move(board, "e4", 0));
+	assert(process_move(board, "a5", 0));
 
-    free_game(board);
+	assert(process_move(board, "e5", 0));
+	assert(process_move(board, "d5", 0));
+
+	assert(process_move(board, "exd6", 0));
+
+	free_game(board);
+
+
+
+	board = init_game();
+
+	assert(process_move(board, "d4", 0));
+	assert(process_move(board, "d5", 0));
+
+	assert(process_move(board, "Nc3", 0));
+	assert(process_move(board, "c6", 0));
+
+	assert(process_move(board, "e4", 0));
+	assert(process_move(board, "Nf6", 0));
+
+	assert(process_move(board, "Bd3", 0));
+	assert(process_move(board, "Na6", 0));
+
+	assert(process_move(board, "Nf3", 0));
+	assert(process_move(board, "Bg4", 0));
+
+	assert(process_move(board, "O-O", 0));
+	assert(process_move(board, "Qc7", 0));
+
+	assert(process_move(board, "Re1", 0));
+	assert(process_move(board, "b6", 0));
+
+	free_game(board);
+
+
+	board = init_game();
+
+	command(board, "place 0 h7");
+	assert(process_move(board, "hxg8=B+", 0));
+
+	free_game(board);
 }
 
 
