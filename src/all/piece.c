@@ -61,6 +61,8 @@ char get_piece_symbol(Piece *p)
 		case PIECE_QUEEN:
 			ret = 'Q';
 			break;
+		default:
+			ret = '?';
 	}
 
 	return ret;
