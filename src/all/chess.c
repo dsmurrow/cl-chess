@@ -335,31 +335,31 @@ bool is_valid_move(Game *board, const Piece *piece, const Location newPlace, int
  */
 int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 {
-    uintmax_t start;
-    int_fast16_t moved;
-    int_fast8_t whosTurnIsIt;
-    char moveStr[9];
-    Move deciphered;
+	uintmax_t start;
+	int_fast16_t moved;
+	int_fast8_t whosTurnIsIt;
+	char moveStr[9];
+	Move deciphered;
 
 
-    if(flags & MOVE_RUNTIME) start = clock();
+	if(flags & MOVE_RUNTIME) start = clock();
 
-    moved = 0;
-    whosTurnIsIt = board->Moves.LatestMove == NULL || board->Moves.LatestMove->Black != NULL ? TEAM_WHITE : TEAM_BLACK;
+	moved = 0;
+	whosTurnIsIt = board->Moves.LatestMove == NULL || board->Moves.LatestMove->Black != NULL ? TEAM_WHITE : TEAM_BLACK;
 
-    if(flags & MOVE_BROADCAST) printf("moved = false and whosTurnIsIt = %" PRIdFAST8 "\n", whosTurnIsIt);
+	if(flags & MOVE_BROADCAST) printf("moved = false and whosTurnIsIt = %" PRIdFAST8 "\n", whosTurnIsIt);
 
-    string_copy(moveStr, inStr);
+	string_copy(moveStr, inStr);
 
-    if(flags & MOVE_BROADCAST) printf("Move about to be deciphered\n");
+	if(flags & MOVE_BROADCAST) printf("Move about to be deciphered\n");
     
-    deciphered = decipher_move(board, whosTurnIsIt, moveStr, flags & DECIPHER_BROADCAST);
+	deciphered = decipher_move(board, whosTurnIsIt, moveStr, flags & DECIPHER_BROADCAST);
    
-    if(flags & MOVE_BROADCAST) printf("Move deciphered\n");
+	if(flags & MOVE_BROADCAST) printf("Move deciphered\n");
 
 
-    if(deciphered.p != NULL && is_valid_move(board, deciphered.p, deciphered.loc, flags & VALID_BROADCASTCALL))
-    {
+	if(deciphered.p != NULL && is_valid_move(board, deciphered.p, deciphered.loc, flags & VALID_BROADCASTCALL))
+	{
 		bool isCastle;
 		char PGNMule[10];
 		uint_fast8_t at_index;
@@ -367,85 +367,85 @@ int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 		Piece *at, *p, *rook, *pKing, *All[2 * PIECES_PER_SIDE], **team;
 
 
-        if(flags & MOVE_BROADCAST) printf("deciphered.p != NULL and move is valid\n");
+		if(flags & MOVE_BROADCAST) printf("deciphered.p != NULL and move is valid\n");
 
-        to_PGN(PGNMule, board, deciphered.p, deciphered.loc, flags & PGN_BROADCAST);
+		to_PGN(PGNMule, board, deciphered.p, deciphered.loc, flags & PGN_BROADCAST);
 
-        get_all_pieces(All, board->White, board->Black);
+		get_all_pieces(All, board->White, board->Black);
 
-        if(flags & MOVE_BROADCAST) printf("all pieces gotten\n");
+		if(flags & MOVE_BROADCAST) printf("all pieces gotten\n");
 
 		location_assign(&isOnLoc, PGNMule[2] - 96, location_getrank(deciphered.p->currentLocation));
 
-    	at = NULL;
-    	if(string_contains(PGNMule, 'x') && piece_is_on(board, deciphered.loc))
-    	{
-            at = piece_at(All, deciphered.loc);
-            assert(at != NULL);
+		at = NULL;
+		if(string_contains(PGNMule, 'x') && piece_is_on(board, deciphered.loc))
+		{
+			at = piece_at(All, deciphered.loc);
+			assert(at != NULL);
 
-        	for(at_index = 0; All[at_index] != at; at_index++);
-        	at_index %= 16;
+			for(at_index = 0; All[at_index] != at; at_index++);
+			at_index %= 16;
 
-        	capture(board, at);
-    	}
-    	else if(string_contains(PGNMule, 'x') && !piece_is_on(board, deciphered.loc) && deciphered.p->type == PIECE_PAWN && piece_is_on(board, isOnLoc))
-    	{
-	    	Location check;
-        	if(flags & MOVE_BROADCAST) printf("en passant part of process move reached\n");
+			capture(board, at);
+		}
+		else if(string_contains(PGNMule, 'x') && !piece_is_on(board, deciphered.loc) && deciphered.p->type == PIECE_PAWN && piece_is_on(board, isOnLoc))
+		{
+			Location check;
+			if(flags & MOVE_BROADCAST) printf("en passant part of process move reached\n");
 
-	    	location_assign(&check, PGNMule[2] - 96, location_getrank(deciphered.p->currentLocation));
+			location_assign(&check, PGNMule[2] - 96, location_getrank(deciphered.p->currentLocation));
 
-        	at = piece_at(All, check);
-        	assert(at != NULL);
-        	assert(at->type == PIECE_PAWN);
+			at = piece_at(All, check);
+			assert(at != NULL);
+			assert(at->type == PIECE_PAWN);
 
-        	if(flags & MOVE_BROADCAST) printf("at gotten\n");
+			if(flags & MOVE_BROADCAST) printf("at gotten\n");
 
-        	for(at_index = 0; All[at_index] != at; at_index++);
+			for(at_index = 0; All[at_index] != at; at_index++);
+			
+			at_index %= 16;
 
-        	at_index %= 16;
+			if(flags & MOVE_BROADCAST) printf("at_index = %" PRIdFAST8 "\n", at_index);
 
-        	if(flags & MOVE_BROADCAST) printf("at_index = %" PRIdFAST8 "\n", at_index);
+			capture(board, at);
+		}
 
-        	capture(board, at);
-    	}
-
-    	if(flags & MOVE_BROADCAST) printf("capture stuff done\n");
+		if(flags & MOVE_BROADCAST) printf("capture stuff done\n");
 
 
-    	p = deciphered.p;
+		p = deciphered.p;
 
 		location_assign(&old, location_getfile(p->currentLocation), location_getrank(p->currentLocation));
        
-    	destination = deciphered.loc;
+		destination = deciphered.loc;
 
 		p->currentLocation = destination;
 
-    	isCastle = p->type == PIECE_KING && !(p->hasMoved) && square(location_getfile(old) - location_getfile(destination)) == 4;
-    	team = p->color == TEAM_WHITE ? board->White : board->Black;
-    	if(isCastle)
-    	{
-        	rook = team[location_getfile(old) - location_getfile(destination) < 0 ? I_ROOK2 : I_ROOK1];
-        	assert(!(rook->hasMoved));
+		isCastle = p->type == PIECE_KING && !(p->hasMoved) && square(location_getfile(old) - location_getfile(destination)) == 4;
+		team = p->color == TEAM_WHITE ? board->White : board->Black;
+		if(isCastle)
+		{
+			rook = team[location_getfile(old) - location_getfile(destination) < 0 ? I_ROOK2 : I_ROOK1];
+			assert(!(rook->hasMoved));
 			assert(location_getrank(rook->currentLocation) == 1 || location_getrank(rook->currentLocation) == 8);
 
-        	location_setfile(&(rook->currentLocation), rook == team[I_ROOK2] ? location_getfile(p->currentLocation) - 1 : location_getfile(p->currentLocation) + 1);
-    	}
+			location_setfile(&(rook->currentLocation), rook == team[I_ROOK2] ? location_getfile(p->currentLocation) - 1 : location_getfile(p->currentLocation) + 1);
+		}
 
-    	pKing = (p->color == TEAM_WHITE ? board->White : board->Black)[I_KING];
-    	if(is_valid_move(board, pKing, pKing->currentLocation, VALID_SELFCHECK | (flags & VALID_BROADCASTCALL)))
-    	{
-	    	char promoted, *str;
+		pKing = (p->color == TEAM_WHITE ? board->White : board->Black)[I_KING];
+		if(is_valid_move(board, pKing, pKing->currentLocation, VALID_SELFCHECK | (flags & VALID_BROADCASTCALL)))
+		{
+			char promoted, *str;
 
 
-        	moved |= destination;
+			moved |= destination;
 			moved |= old << 8;
 
-        	p->hasMoved = true;
-        	if(isCastle)
+			p->hasMoved = true;
+			if(isCastle)
 			{
 				moved = 0;
-            	rook->hasMoved = true;
+				rook->hasMoved = true;
 
 				moved |= location_getrank(rook->currentLocation) << 8;
 				moved |= rook == team[I_ROOK1] ? 0xf015: 0xf058; /* 1111 0000 0001 0101 : 1111 0000 0101 1000 */
@@ -453,48 +453,48 @@ int_fast16_t process_move(Game *board, const char *inStr, int_fast8_t flags)
 				assert(moved == 0xf115 || moved == 0xf815 || moved == 0xf158 || moved == 0xf858);
 			}
 
-        	add_move(&(board->Moves), PGNMule);
+			add_move(&(board->Moves), PGNMule);
 
-        	if(flags & VALID_BROADCASTCALL) printf("move added\n");
-
-
-        	promoted = piece_promoted(p, inStr);
-        	post_PGN(PGNMule, board, promoted);
-
-        	if(flags & VALID_BROADCASTCALL) printf("post_PGN = %s\n", PGNMule);
+			if(flags & VALID_BROADCASTCALL) printf("move added\n");
 
 
-        	str = malloc(10 * sizeof(char));
-        	if(flags & VALID_BROADCASTCALL) printf("str memory allocated\n");
+			promoted = piece_promoted(p, inStr);
+			post_PGN(PGNMule, board, promoted);
+			
+			if(flags & VALID_BROADCASTCALL) printf("post_PGN = %s\n", PGNMule);
 
-        	string_copy(str, PGNMule);
-        	if(flags & VALID_BROADCASTCALL) printf("string copied\n");
 
-        	update_latest_move(&(board->Moves), str);
-        	if(flags & VALID_BROADCASTCALL) printf("latest move updated\n");
-    	}
-    	else
-    	{
-        	if(flags & MOVE_BROADCAST) printf("bad move branch\n");
+			str = malloc(10 * sizeof(char));
+			if(flags & VALID_BROADCASTCALL) printf("str memory allocated\n");
+
+			string_copy(str, PGNMule);
+			if(flags & VALID_BROADCASTCALL) printf("string copied\n");
+
+			update_latest_move(&(board->Moves), str);
+			if(flags & VALID_BROADCASTCALL) printf("latest move updated\n");
+		}
+		else
+		{
+			if(flags & MOVE_BROADCAST) printf("bad move branch\n");
 
 			p->currentLocation = old;
 
-        	if(at != NULL) uncapture(board, at, at_index, deciphered.loc);
+			if(at != NULL) uncapture(board, at, at_index, deciphered.loc);
 
-        	if(isCastle) location_setfile(&(rook->currentLocation), rook == team[I_ROOK2] ? 8 : 1);
-    	}
-    }
+			if(isCastle) location_setfile(&(rook->currentLocation), rook == team[I_ROOK2] ? 8 : 1);
+		}
+	}
 
-    if(flags & MOVE_RUNTIME)
-    {
-        uintmax_t endtime = clock();
+	if(flags & MOVE_RUNTIME)
+	{
+		uintmax_t endtime = clock();
 
-        functime = ((double) (endtime - start)) / CLOCKS_PER_SEC;
-    }
+		functime = ((double) (endtime - start)) / CLOCKS_PER_SEC;
+	}
 
-    if(flags & VALID_BROADCASTCALL) printf("process_move returning %s\n", moved ? "true" : "false");
+	if(flags & VALID_BROADCASTCALL) printf("process_move returning %s\n", moved ? "true" : "false");
 
-    return moved;
+	return moved;
 }
 
 
@@ -546,158 +546,141 @@ int_fast8_t BLACKPIECE = BLACK;
  */
 void print_board(Game *board, int_fast8_t flags)
 {
-    const char hyphens[18] = "-----------------";
-    uint_fast8_t i, j;
-    Location loc;
-    Piece *All[2 * PIECES_PER_SIDE], *current;
-    bool usable;
+	const char hyphens[18] = "-----------------";
+	uint_fast8_t i, j;
+	Location loc;
+	Piece *All[2 * PIECES_PER_SIDE], *current;
+	bool usable;
 
-    char *topEndFill = "\t";
-    if(flags & PB_GAMEOVER)
-    {
-	uint_fast8_t mask;
+	char *topEndFill = "\t";
+	if(flags & PB_GAMEOVER)
+	{
+		uint_fast8_t mask;
+		
+		assert((flags & PB_RESULTMASK) != 0);
 
-        assert((flags & PB_RESULTMASK) != 0);
+		mask = (flags & PB_RESULTMASK) >> 2;
 
-        mask = (flags & PB_RESULTMASK) >> 2;
-
-        assert(mask >= 1 && mask <= 3);
-
-
-
-        switch(mask)
-        {
-            case 0:
-                topEndFill = "CONTINUED";
-                break;
-            case 1:
-                topEndFill = "STALEMATE";
-                break;
-            case 2:
-                topEndFill = "WHITE WINS";
-                break;
-            case 3:
-                topEndFill = "BLACK WINS";
-        }
-    }
-
-    get_all_pieces(All, board->White, board->Black);
-
-    makeColor(BORDERCHAR, BORDERTILE);
-    printf("%s", hyphens);
-    RESETCOLOR;
-    if(flags & PB_SHOWMOVES) printf("\t%s\t%s%s-----", topEndFill, hyphens, hyphens);
-    else if(flags & PB_GAMEOVER)
-        printf("\t%s%s%s", topEndFill, flags & PB_SHOWMOVES ? hyphens : "", flags & PB_SHOWMOVES ? hyphens: "");
-
-    printf("\n");
-
-    for(i = 8; i >= 1; i--)
-    {
-        for(j = 1; j <= 8; j++)
-        {
-	    char c;
-	    int_fast8_t tileColor, pieceColor, k;
-
-            tileColor = u_8(j, i) <= 3 ? WHITETILE : BLACKTILE;
-            pieceColor = tileColor;
-
-            assert(i == 8 && j == 1 ? tileColor == WHITETILE : 1);
-
-            usable = false;
-            for(k = 0; k < 2 * PIECES_PER_SIDE; k++)
-            {
-                current = All[k];
-                loc = current->currentLocation;
-                if(loc != 0 && location_getfile(loc) == j && location_getrank(loc) == i)
-                {
-                    usable = true;
-                    break;
-                }
-
-            }
-
-            if(usable)
-            {
-                switch(current->type)
-                {
-                    case PIECE_PAWN:
-                        c = 'P';
-                        break;
-                    case PIECE_BISHOP:
-                        c = 'B';
-                        break;
-                    case PIECE_KNIGHT:
-                        c = 'N';
-                        break;
-                    case PIECE_ROOK:
-                        c = 'R';
-                        break;
-                    case PIECE_KING:
-                        c = 'K';
-                        break;
-                    case PIECE_QUEEN:
-                        c = 'Q';
-                        break;
-                    default:
-                        c = '?';
-                }
-                pieceColor = current->color == TEAM_WHITE ? WHITEPIECE : BLACKPIECE;
-            }
-            else
-                c = '#';
+		assert(mask >= 1 && mask <= 3);
 
 
-            makeColor(BORDERCHAR, BORDERTILE);
-            printf(j == 1 ? "|" : "");
-            RESETCOLOR;
 
-            makeColor(pieceColor, tileColor);
-            printf("%c", c);
-            RESETCOLOR;
+		switch(mask)
+		{
+			case 0:
+				topEndFill = "CONTINUED";
+				break;
+			case 1:
+				topEndFill = "STALEMATE";
+				break;
+			case 2:
+				topEndFill = "WHITE WINS";
+				break;
+			case 3:
+				topEndFill = "BLACK WINS";
+		}
+	}
 
-            if(j == 8)
-            {
-                makeColor(BORDERCHAR, BORDERTILE);
-                printf("|");
-                RESETCOLOR;
-                if(flags & PB_SHOWMOVES)
-                {
-                    const char *MOVEFORMAT = "\t\t\t%" PRIiMAX "\t\t%s\t\t%s";
+	get_all_pieces(All, board->White, board->Black);
 
-                    Turn *curMove;
-                    if(board->Moves.num > 8)
-                    {
+	makeColor(BORDERCHAR, BORDERTILE);
+	printf("%s", hyphens);
+	RESETCOLOR;
+	if(flags & PB_SHOWMOVES) 
+		printf("\t%s\t%s%s-----", topEndFill, hyphens, hyphens);
+	else if(flags & PB_GAMEOVER)
+		printf("\t%s%s%s", topEndFill, flags & PB_SHOWMOVES ? hyphens : "", flags & PB_SHOWMOVES ? hyphens: "");
+
+	printf("\n");
+	
+	for(i = 8; i >= 1; i--)
+	{
+		for(j = 1; j <= 8; j++)
+		{
+			char c;
+			int_fast8_t tileColor, pieceColor, k;
+			
+			tileColor = u_8(j, i) <= 3 ? WHITETILE : BLACKTILE;
+			pieceColor = tileColor;
+
+			assert(i == 8 && j == 1 ? tileColor == WHITETILE : 1);
+			
+			usable = false;
+			for(k = 0; k < 2 * PIECES_PER_SIDE; k++)
+			{
+				current = All[k];
+				loc = current->currentLocation;
+				if(loc != 0 && location_getfile(loc) == j && location_getrank(loc) == i)
+				{
+					usable = true;
+					break;
+				}
+
+			}
+
+			if(usable)
+			{
+				c = get_piece_icon(*current);
+				pieceColor = current->color == TEAM_WHITE ? WHITEPIECE : BLACKPIECE;
+			}
+			else
+				c = '#';
+
+
+			makeColor(BORDERCHAR, BORDERTILE);
+			printf(j == 1 ? "|" : "");
+			RESETCOLOR;
+
+			makeColor(pieceColor, tileColor);
+			printf("%c", c);
+			RESETCOLOR;
+
+			if(j == 8)
+			{
+				makeColor(BORDERCHAR, BORDERTILE);
+				printf("|");
+				RESETCOLOR;
+				
+				if(flags & PB_SHOWMOVES)
+				{
+					const char *MOVEFORMAT = "\t\t\t%" PRIiMAX "\t\t%s\t\t%s";
+					
+					Turn *curMove;
+					if(board->Moves.num > 8)
+					{
 						char *black;
 
-                        curMove = get_move_number(board->Moves, board->Moves.num - (i-1));
-                        black = curMove->Black == NULL ? "" : curMove->Black;
-                        printf(MOVEFORMAT, curMove->number, curMove->White, black);
-                    }
-                    else if(get_move_number(board->Moves, 9-i) != NULL)
-                    {
-                        curMove = get_move_number(board->Moves, 9-i);
-                        if(curMove != NULL)
-                        {
-                            char *black = curMove->Black == NULL ? "" : curMove->Black;
-                            printf(MOVEFORMAT, curMove->number, curMove->White, black);
-                        }
-                    }
-                }
-                printf("\n");
-            }
-            else
-            {
-                makeColor(INBETWEENCHAR, INBETWEENTILE);
-                printf("|");
-                RESETCOLOR;
-            }
-        }
-    }
-
-    makeColor(BORDERCHAR, BORDERTILE);
-    printf("%s", hyphens);
-    RESETCOLOR;
-    if(flags & PB_RUNTIME) printf("\n%.1lfms (%ld)", functime * 1000, CLOCKS_PER_SEC);
-    printf("\n\n");
+						curMove = get_move_number(board->Moves, board->Moves.num - (i-1));
+						black = curMove->Black == NULL ? "" : curMove->Black;
+						printf(MOVEFORMAT, curMove->number, curMove->White, black);
+					}
+					else if(get_move_number(board->Moves, 9-i) != NULL)
+					{
+						curMove = get_move_number(board->Moves, 9-i);
+						if(curMove != NULL)
+						{
+							char *black = curMove->Black == NULL ? "" : curMove->Black;
+							printf(MOVEFORMAT, curMove->number, curMove->White, black);
+						}
+					}
+				}
+			
+				printf("\n");
+			}
+			else
+			{
+				makeColor(INBETWEENCHAR, INBETWEENTILE);
+				printf("|");
+				RESETCOLOR;
+			}
+		}
+	}
+	
+	makeColor(BORDERCHAR, BORDERTILE);
+	printf("%s", hyphens);
+	RESETCOLOR;
+	
+	if(flags & PB_RUNTIME) printf("\n%.1lfms (%ld)", functime * 1000, CLOCKS_PER_SEC);
+	
+	printf("\n\n");
 }
