@@ -53,7 +53,7 @@ static char advance_file_pointer_until(FILE *fp, char c)
 
 	do
 	{
-    	getGot = my_fgetc(fp);
+    		getGot = my_fgetc(fp);
 	} while(getGot != c && getGot != 0);
 
     return getGot;
