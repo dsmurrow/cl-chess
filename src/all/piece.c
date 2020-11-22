@@ -100,7 +100,7 @@ char get_piece_icon(Piece p)
 }
 
 /**
- * Puts all of the piece in black and white into a single array.
+ * Puts all of the pieces in black and white into a single array.
  *
  * @param board   The game instance being played
  *
@@ -137,7 +137,13 @@ Piece *piece_at(Piece **all, Location loc)
 	return ret;
 }
 
-
+/**
+ * Determines if a piece is a valid candidate for promotion and
+ * is promoted if it is.
+ *
+ * @param p 			The candidate for promotion
+ * @param analString	Move string being analyzed
+ */
 char piece_promoted(Piece *p, const char *analString)
 {
 	char ret = 0;
